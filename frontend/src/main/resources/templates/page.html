@@ -14,7 +14,7 @@
             <div class="input-group-prepend">
                 <span class="input-group-text" id="inputGroup-sizing-lg">Path</span>
             </div>
-            <input id="text" type="text" class="form-control" placeholder="Foo.java#Bar or Bin.class#Method">
+            <input id="text" type="text" class="form-control" placeholder="/path/to/package/Foo.java#Bar or /path/to/binary/Bin.class#Method">
             <div class="input-group-append">
                 <button id="search-button" type="button" class="btn btn-primary btn-lg">Search</button>
             </div>
@@ -31,17 +31,17 @@
             <div class="tab-content" id="pills-tabContent">
                 <div class="tab-pane fade show active" id="pills-caller" role="tabpanel">
                     <div id="tree-graph">
+                        <b>Please input the keyword.</b>
                     </div>
                 </div>
                 <div class="tab-pane fade" id="pills-callee" role="tabpanel" >
                     <div class="list-group" id="calleeLst">
-                        <a href="#" class="list-group-item list-group-item-action">N/A</a>
+                        <b>Please input the keyword.</b>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-
 
 </div>
 <script th:src="@{/webjars/jquery/3.4.1/jquery.min.js}"></script>

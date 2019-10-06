@@ -26,7 +26,7 @@ public class MetaDataService {
 
         List<TblMetaData> selfMetaLst = metaDataRepository.findSelfByPath(searchPath);
         if (selfMetaLst.size() > 1) {
-            throw new RuntimeException("Find more than one root node.");
+            throw new RuntimeException("Found more than one root node.");
         } else if (selfMetaLst.isEmpty()) {
             throw new RuntimeException("Root node not found.");
         }
@@ -44,11 +44,11 @@ public class MetaDataService {
         TreantNode rootNodeJson = new TreantNode();
         rootNodeJson.setName(getSearchPath(rootNode.getMethod()));
         rootNodeJson.setDesc(rootNode.getComment().split("\\R", 2)[0]);
+        rootNodeJson.setDataFullPath(rootNode.getMethod());
         rootJson.setText(rootNodeJson);
         setJson(callerTreeGraph.getChildren(), rootJson);
 
         response.setCalleeLst(Arrays.asList(rootNode.getContext(), rootNode.getComment().split("\\R", 2)[0]));
-        //response.setCallerLst(Arrays.asList(callerTreeGraph.toString()));
         response.setNodeStructure(rootJson);
         return response;
 
@@ -60,13 +60,9 @@ public class MetaDataService {
             TreantRoot cRoot = new TreantRoot();
             TreantNode cNode = new TreantNode();
             cNode.setName(getSearchPath(ssNode.getData().getMethod()));
+            cNode.setDataFullPath(ssNode.getData().getMethod());
             // get first line
             cNode.setDesc(ssNode.getData().getComment().split("\\R", 2)[0]);
-//            try {
-//                cNode.setDesc(URLEncoder.encode(ssNode.getData().getComment().split("\\R", 2)[0], "utf-8"));
-//            } catch (UnsupportedEncodingException e) {
-//                e.printStackTrace();
-//            }
             cRoot.setText(cNode);
             rootJson.getChildren().add(cRoot);
             setJson(ssNode.getChildren(), cRoot);
@@ -102,7 +98,6 @@ public class MetaDataService {
         }
         log.info("Current childNodeId: {}", childNode.getData().getId());
         log.info("Current addedNode: {}, Pid: {}, isContain? {}", tbl.getId(), pIds.toString(), pIds.contains(tbl.getId()));
-        //tbl.setComment(tbl.getComment() + "#" + tbl.getId() + "#" + pIds.toString() + "#" + pIds.contains(tbl.getId()));
         if (pIds.contains(tbl.getId())) {
             return true;
         }
