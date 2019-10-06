@@ -4,6 +4,8 @@
     <meta charset="UTF-8"/>
     <title>JCHV - Java Call Hierarchy Viewer</title>
     <link th:href="@{/webjars/bootstrap/4.3.1/css/bootstrap.min.css}" rel="stylesheet"/>
+    <link th:href="@{/static/treantjs/Treant.css}" rel="stylesheet"/>
+    <link th:href="@{/static/page.css}" rel="stylesheet"/>
 </head>
 <body>
 <div style="padding:2rem;">
@@ -20,19 +22,22 @@
         <div style="padding-top: 4rem;">
             <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
                 <li class="nav-item">
-                    <a class="nav-link active" id="pills-home-tab" data-toggle="pill" href="#pills-home" role="tab" aria-controls="pills-home" aria-selected="true">Caller</a>
+                    <a class="nav-link active" id="pills-caller-tab" data-toggle="pill" href="#pills-caller" role="tab">Caller</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" id="pills-profile-tab" data-toggle="pill" href="#pills-profile" role="tab" aria-controls="pills-profile" aria-selected="false">Callee</a>
+                    <a class="nav-link" id="pills-callee-tab" data-toggle="pill" href="#pills-callee" role="tab">Callee</a>
                 </li>
             </ul>
             <div class="tab-content" id="pills-tabContent">
-                <div class="tab-pane fade show active" id="pills-home" role="tabpanel" aria-labelledby="pills-home-tab">
-                    <div class="list-group" id="list1">
-                        <a href="#" class="list-group-item list-group-item-action">NOT FOUND</a>
+                <div class="tab-pane fade show active" id="pills-caller" role="tabpanel">
+                    <div id="tree-graph">
                     </div>
                 </div>
-                <div class="tab-pane fade" id="pills-profile" role="tabpanel" aria-labelledby="pills-profile-tab">...</div>
+                <div class="tab-pane fade" id="pills-callee" role="tabpanel" >
+                    <div class="list-group" id="calleeLst">
+                        <a href="#" class="list-group-item list-group-item-action">N/A</a>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -41,6 +46,8 @@
 </div>
 <script th:src="@{/webjars/jquery/3.4.1/jquery.min.js}"></script>
 <script th:src="@{/webjars/bootstrap/4.3.1/js/bootstrap.min.js}"></script>
+<script th:src="@{/static/treantjs/vendor/raphael.js}"></script>
+<script th:src="@{/static/treantjs/Treant.js}"></script>
 <script th:src="@{/static/page.js}"></script>
 </body>
 

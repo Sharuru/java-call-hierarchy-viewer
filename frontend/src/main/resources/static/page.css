@@ -1,0 +1,22 @@
+.nodeStyle {
+    padding: 2px;
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    border-radius: 3px;
+    background-color: #ffffff;
+    border: 1px solid #000;
+    width: 250px;
+    height: 8rem;
+    font-family: Tahoma;
+    font-size: 12px;
+    overflow: scroll;
+    overflow-wrap:break-word;
+}
+
+.nodeStyle img {
+    margin-right:  10px;
+}
+
+.Treant .collapse-switch { width: 100%; height: 100%; border: none; }
+.Treant .node.collapsed { background-color: #DEF82D; }
+.Treant .node.collapsed .collapse-switch { background: none; }
