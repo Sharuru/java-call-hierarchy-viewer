@@ -1,9 +1,7 @@
 package me.sharuru.jchv.frontend.model;
 
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.Value;
 
 import java.util.ArrayList;
 import java.util.List;
