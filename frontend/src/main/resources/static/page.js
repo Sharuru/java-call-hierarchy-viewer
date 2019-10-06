@@ -14,17 +14,30 @@ var chartConfig = {
             HTMLclass: 'nodeStyle'
         },
         levelSeparation: 60,
-        siblingSeparation: 60,
-        subTeeSeparation: 60
+        siblingSeparation: 30,
+        subTeeSeparation: 30,
+        callback: {
+            onCreateNode: function(treeNode, treeNodeDom) {
+                $(treeNodeDom).prepend('<button onclick="copyToInput(\'' + treeNode.text.dataFullPath + '\')">Copy to input box.</button>');
+            }
+        }
     },
     nodeStructure: {}
 };
+
+function copyToInput(value){
+    $("#text").val(value);
+}
 
 $("#search-button").on("click", function () {
     $("#pills-caller-tab").click();
     var value = $("#text").val().trim();
     console.log("Value: " + value);
-    $("#tree-graph").html("Searching...");
+    if(value == ''){
+        $("#tree-graph").html("<b>Please enter your keyword.</b>");
+        return;
+    }
+    $("#tree-graph").html("<b>Searching...</b>");
     $.ajax({
             url: "/search",
             type: "get",
@@ -42,7 +55,7 @@ $("#search-button").on("click", function () {
             },
             error: function (e) {
                 console.log(e);
-                $("#tree-graph").html("<b>Error: " + e.responseJSON.error + ", " + e.responseJSON.message + "</b><br/>" + e.responseJSON.trace);
+                $("#tree-graph").html("<b>ERROR: " + e.responseJSON.error + ". " + e.responseJSON.message + "</b>");
             }
         }
     )
