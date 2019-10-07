@@ -39,6 +39,20 @@ public class MetaDataService {
 
         visitChildNode(callerTreeGraph.getChildren());
 
+        Node<TblMetaData> calleeTreeGraph = new Node<>(rootNode);
+        List<String> calleeMethodLst = new ArrayList<>();
+        Arrays.asList(rootNode.getContext().split("\\R")).forEach(line ->{
+            if(line.startsWith("SRC")){
+                calleeMethodLst.add(line.substring(line.indexOf("SRC: ") + 5));
+            }
+        });
+        for(String method : calleeMethodLst){
+            calleeTreeGraph.addChild(new Node<>(metaDataRepository.findSelfByPath(method).get(0)));
+        }
+        visitCalleeNode(calleeTreeGraph.getChildren());
+
+
+
         // TODO
         TreantRoot rootJson = new TreantRoot();
         TreantNode rootNodeJson = new TreantNode();
@@ -48,7 +62,19 @@ public class MetaDataService {
         rootJson.setText(rootNodeJson);
         setJson(callerTreeGraph.getChildren(), rootJson);
 
+        TreantRoot calleeRootJson = new TreantRoot();
+        TreantNode calleeRootNodeJson = new TreantNode();
+        calleeRootNodeJson.setName(getSearchPath(rootNode.getMethod()));
+        calleeRootNodeJson.setDesc(rootNode.getComment().split("\\R", 2)[0]);
+        calleeRootNodeJson.setDataFullPath(rootNode.getMethod());
+        calleeRootJson.setText(calleeRootNodeJson);
+        setJson(calleeTreeGraph.getChildren(), calleeRootJson);
+
+
+
+
         response.setCalleeLst(Arrays.asList(rootNode.getContext(), rootNode.getComment().split("\\R", 2)[0]));
+        response.setCalleeNodeStructure(calleeRootJson);
         response.setNodeStructure(rootJson);
         return response;
 
@@ -85,6 +111,21 @@ public class MetaDataService {
                 }
             }
             visitChildNode(childNode.getChildren());
+        }
+    }
+
+    private void visitCalleeNode(List<Node<TblMetaData>> parentNodeLst){
+        for (Node<TblMetaData> childNode : parentNodeLst) {
+            List<String> calleeMethodLst = new ArrayList<>();
+            Arrays.asList(childNode.getData().getContext().split("\\R")).forEach(line ->{
+                if(line.startsWith("SRC")){
+                    calleeMethodLst.add(line.substring(line.indexOf("SRC: ") + 5));
+                }
+            });
+            for(String method : calleeMethodLst){
+                childNode.addChild(new Node<>(metaDataRepository.findSelfByPath(method).get(0)));
+            }
+            visitCalleeNode(childNode.getChildren());
         }
     }
 
