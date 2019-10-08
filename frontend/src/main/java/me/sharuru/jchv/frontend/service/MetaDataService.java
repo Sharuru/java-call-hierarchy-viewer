@@ -42,7 +42,7 @@ public class MetaDataService {
         Node<TblMetaData> calleeTreeGraph = new Node<>(rootNode);
         List<String> calleeMethodLst = new ArrayList<>();
         Arrays.asList(rootNode.getContext().split("\\R")).forEach(line ->{
-            if(line.startsWith("SRC")){
+            if(line.startsWith("SRC") && !line.contains("Model.java#")){
                 calleeMethodLst.add(line.substring(line.indexOf("SRC: ") + 5));
             }
         });
@@ -118,12 +118,17 @@ public class MetaDataService {
         for (Node<TblMetaData> childNode : parentNodeLst) {
             List<String> calleeMethodLst = new ArrayList<>();
             Arrays.asList(childNode.getData().getContext().split("\\R")).forEach(line ->{
-                if(line.startsWith("SRC")){
+                if(line.startsWith("SRC") && !line.contains("Model.java#")){
                     calleeMethodLst.add(line.substring(line.indexOf("SRC: ") + 5));
                 }
             });
             for(String method : calleeMethodLst){
-                childNode.addChild(new Node<>(metaDataRepository.findSelfByPath(method).get(0)));
+                TblMetaData meta = metaDataRepository.findSelfByPath(method).get(0);
+                if(!isLooping(childNode, meta)){
+                    childNode.addChild(new Node<>(meta));
+                }else{
+                    log.error("This node is skipped.");
+                }
             }
             visitCalleeNode(childNode.getChildren());
         }
