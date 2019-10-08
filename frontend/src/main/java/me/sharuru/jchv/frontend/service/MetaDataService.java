@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -20,6 +21,8 @@ public class MetaDataService {
 
     @Autowired
     MetaDataRepository metaDataRepository;
+
+    List<String> allCalleeMethods = new ArrayList<>();
 
     public SearchResponse search(String searchPath) {
         SearchResponse response = new SearchResponse();
@@ -39,6 +42,8 @@ public class MetaDataService {
 
         visitChildNode(callerTreeGraph.getChildren());
 
+
+
         Node<TblMetaData> calleeTreeGraph = new Node<>(rootNode);
         List<String> calleeMethodLst = new ArrayList<>();
         Arrays.asList(rootNode.getContext().split("\\R")).forEach(line ->{
@@ -47,11 +52,11 @@ public class MetaDataService {
             }
         });
         for(String method : calleeMethodLst){
-            calleeTreeGraph.addChild(new Node<>(metaDataRepository.findSelfByPath(method).get(0)));
+            TblMetaData meta = metaDataRepository.findSelfByPath(method).get(0);
+            calleeTreeGraph.addChild(new Node<>(meta));
+            allCalleeMethods.add(meta.getMethod());
         }
         visitCalleeNode(calleeTreeGraph.getChildren());
-
-
 
         // TODO
         TreantRoot rootJson = new TreantRoot();
@@ -71,9 +76,12 @@ public class MetaDataService {
         setJson(calleeTreeGraph.getChildren(), calleeRootJson);
 
 
+        List<String> distinctCalleeLest = allCalleeMethods.stream()
+                .distinct()
+                .sorted()
+                .collect(Collectors.toList());
 
-
-        response.setCalleeLst(Arrays.asList(rootNode.getContext(), rootNode.getComment().split("\\R", 2)[0]));
+        response.setCalleeLst(distinctCalleeLest);
         response.setCalleeNodeStructure(calleeRootJson);
         response.setNodeStructure(rootJson);
         return response;
@@ -126,6 +134,7 @@ public class MetaDataService {
                 TblMetaData meta = metaDataRepository.findSelfByPath(method).get(0);
                 if(!isLooping(childNode, meta)){
                     childNode.addChild(new Node<>(meta));
+                    allCalleeMethods.add(meta.getMethod());
                 }else{
                     log.error("This node is skipped.");
                 }
