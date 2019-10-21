@@ -22,8 +22,6 @@ public class MetaDataService {
     @Autowired
     MetaDataRepository metaDataRepository;
 
-    List<String> allCalleeMethods = new ArrayList<>();
-
     public SearchResponse search(String searchPath) {
         SearchResponse response = new SearchResponse();
 
@@ -37,17 +35,21 @@ public class MetaDataService {
 
         Node<TblMetaData> callerTreeGraph = new Node<>(rootNode);
         for (TblMetaData childNode : metaDataRepository.findCallerByPath(rootNode.getMethod())) {
-            callerTreeGraph.addChild(new Node<>(childNode));
-        }
+            String line = childNode.getMethod();
+            if(!line.contains("Model.java#") && !line.contains("Base.java#") && !line.contains("Criteria.java#")){
+                callerTreeGraph.addChild(new Node<>(childNode));
+            }
 
+        }
         visitChildNode(callerTreeGraph.getChildren());
 
-
+        List<String> allCalleeMethods = new ArrayList<>();
 
         Node<TblMetaData> calleeTreeGraph = new Node<>(rootNode);
         List<String> calleeMethodLst = new ArrayList<>();
         Arrays.asList(rootNode.getContext().split("\\R")).forEach(line ->{
-            if(line.startsWith("SRC") && !line.contains("Model.java#")){
+            if(line.startsWith("SRC") && !line.contains("Model.java#") && !line.contains("Base.java#") && !line.contains("Criteria.java#")
+            && !rootNode.getMethod().equals(line)){
                 calleeMethodLst.add(line.substring(line.indexOf("SRC: ") + 5));
             }
         });
@@ -56,7 +58,7 @@ public class MetaDataService {
             calleeTreeGraph.addChild(new Node<>(meta));
             allCalleeMethods.add(meta.getMethod());
         }
-        visitCalleeNode(calleeTreeGraph.getChildren());
+        visitCalleeNode(calleeTreeGraph.getChildren(), allCalleeMethods);
 
         // TODO
         TreantRoot rootJson = new TreantRoot();
@@ -122,24 +124,27 @@ public class MetaDataService {
         }
     }
 
-    private void visitCalleeNode(List<Node<TblMetaData>> parentNodeLst){
+    private void visitCalleeNode(List<Node<TblMetaData>> parentNodeLst, List<String> allCalleeMethods){
         for (Node<TblMetaData> childNode : parentNodeLst) {
             List<String> calleeMethodLst = new ArrayList<>();
             Arrays.asList(childNode.getData().getContext().split("\\R")).forEach(line ->{
-                if(line.startsWith("SRC") && !line.contains("Model.java#")){
+                if(line.startsWith("SRC") && !line.contains("Model.java#") && !line.contains("Base.java#") && !line.contains("Criteria.java#")){
                     calleeMethodLst.add(line.substring(line.indexOf("SRC: ") + 5));
+                    log.info("Line {} is ADDED to {}", line, childNode.getData().getMethod());
                 }
             });
             for(String method : calleeMethodLst){
                 TblMetaData meta = metaDataRepository.findSelfByPath(method).get(0);
-                if(!isLooping(childNode, meta)){
-                    childNode.addChild(new Node<>(meta));
-                    allCalleeMethods.add(meta.getMethod());
-                }else{
-                    log.error("This node is skipped.");
+                if(!method.equals(childNode.getData().getMethod())){
+                    if(!isLooping(childNode, meta)){
+                        childNode.addChild(new Node<>(meta));
+                        allCalleeMethods.add(meta.getMethod());
+                    }else{
+                        log.error("This node is skipped.");
+                    }
                 }
             }
-            visitCalleeNode(childNode.getChildren());
+            visitCalleeNode(childNode.getChildren(), allCalleeMethods);
         }
     }
 

@@ -7,14 +7,14 @@ import javax.persistence.*;
 
 @Data
 @Entity
-@Table(name = "bbbbb")
+@Table(name = "meta_clean")
 @NoArgsConstructor
 public class TblMetaData {
 
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq")
-    @SequenceGenerator(name = "seq", sequenceName = "bbbbb_id_seq")
+    @SequenceGenerator(name = "seq", sequenceName = "meta_data_id_seq")
     private Long id;
 
     private String method;

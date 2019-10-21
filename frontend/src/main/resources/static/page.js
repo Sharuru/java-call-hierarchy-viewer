@@ -91,6 +91,7 @@ $("#search-button").on("click", function () {
                 $("#callee-tree-graph").html("<b>Refreshing...</b>");
                 document.getElementById("loader").style.display = "none";
                 document.getElementById("overlay").style.display = "none";
+                $("#callee-list").html('');
                 data.calleeLst.forEach(function(value){
                     $("#callee-list").append(value + "<br/>");
                 })
