@@ -94,7 +94,8 @@ $("#search-button").on("click", function () {
                 $("#callee-list").html('');
                 data.calleeLst.forEach(function(value){
                     $("#callee-list").append(value + "<br/>");
-                })
+                });
+                $("#cnt").text(data.callerCount);
             },
             error: function (e) {
                 console.log(e);
@@ -102,6 +103,7 @@ $("#search-button").on("click", function () {
                 $("#callee-tree-graph").html("<b>ERROR: " + e.responseJSON.error + ". " + e.responseJSON.message + "</b>");
                 document.getElementById("loader").style.display = "none";
                 document.getElementById("overlay").style.display = "none";
+                $("#cnt").text(0);
             }
         }
     )

@@ -13,6 +13,8 @@ public class SearchResponse {
 
     TreantRoot nodeStructure = new TreantRoot();
 
+    int callerCount = 0;
+
     TreantRoot calleeNodeStructure = new TreantRoot();
 
 

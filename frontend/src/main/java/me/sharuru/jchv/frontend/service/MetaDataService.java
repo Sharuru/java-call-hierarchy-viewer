@@ -34,7 +34,10 @@ public class MetaDataService {
         TblMetaData rootNode = selfMetaLst.get(0);
 
         Node<TblMetaData> callerTreeGraph = new Node<>(rootNode);
-        for (TblMetaData childNode : metaDataRepository.findCallerByPath(rootNode.getMethod())) {
+        List<TblMetaData> callerLst = metaDataRepository.findCallerByPath(rootNode.getMethod());
+        response.setCallerCount(callerLst.size());
+
+        for (TblMetaData childNode : callerLst) {
             String line = childNode.getMethod();
             if(!line.contains("Model.java#") && !line.contains("Base.java#") && !line.contains("Criteria.java#")){
                 callerTreeGraph.addChild(new Node<>(childNode));
@@ -86,6 +89,7 @@ public class MetaDataService {
         response.setCalleeLst(distinctCalleeLest);
         response.setCalleeNodeStructure(calleeRootJson);
         response.setNodeStructure(rootJson);
+
         return response;
 
     }
