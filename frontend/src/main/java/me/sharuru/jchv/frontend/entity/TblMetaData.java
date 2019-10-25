@@ -7,7 +7,7 @@ import javax.persistence.*;
 
 @Data
 @Entity
-@Table(name = "meta_clean")
+@Table(name = "meta_new")
 @NoArgsConstructor
 public class TblMetaData {
 
