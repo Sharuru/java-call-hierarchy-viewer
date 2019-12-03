@@ -20,14 +20,6 @@ div#watermark {
     pointer-events: none;
 }
 
-.minimap {
-    border: 2px solid gray;
-    position: absolute;
-    top: 1rem;
-    right: 1rem;
-    background: rgba(255, 255, 255, 0.6);
-}
-
 div#info-area {
     width: 30rem;
     height: 160px;
@@ -49,4 +41,12 @@ div#info-content{
 div#info-button-layer{
     padding: 0.2rem;
     background: #F1F1F1;
+}
+
+.minimap {
+    border: 2px solid gray;
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: rgba(255, 255, 255, 0.6);
 }
