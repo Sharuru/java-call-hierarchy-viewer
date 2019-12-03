@@ -39,7 +39,7 @@ public class TreeGraphNode implements Serializable {
         className = className.length() >= 32 ? className.substring(0, 30).concat("...") : className;
         methodName = methodName.length() >= 32 ? methodName.substring(0, 30).concat("...") : methodName;
 
-        this.uiMethodPath = classWithMethod;
+        this.uiMethodPath = classWithMethod.replace('.', '#');
 
         return className + "\n" + methodName + "\n" + paramCount + " Params";
     }

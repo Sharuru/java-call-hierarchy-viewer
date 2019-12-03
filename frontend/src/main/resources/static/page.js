@@ -1,17 +1,25 @@
-$(document).ready(function(){
+$(document).ready(function () {
 
+    // Debug
     $("#keyword-input").val('jp.co.toyotsu.jast.lx.lx09.web.lx09s0010.Lx09S0010Controller.lx09U0020Search(Lx09U0010Criteria, Lx09U0020Form, BindingResult, Pageable, Model)');
 
+    // Inspector
     $('#info-func-btn-1').tooltip({
         'trigger': 'hover',
         'placement': 'bottom',
         'title': 'Set qualified name as keyword'
     });
+
+    $("#info-func-btn-1").on('click', function () {
+        $("#keyword-input").val($('#info-qualified-name').text());
+    });
+
     $('#info-func-btn-2').tooltip({
         'trigger': 'hover',
         'placement': 'bottom',
         'title': 'Copy class filename'
     });
+
     $('#info-func-btn-3').tooltip({
         'trigger': 'hover',
         'placement': 'bottom',
@@ -19,27 +27,43 @@ $(document).ready(function(){
     });
 
     $("#info-area").draggable({cursor: "move", handle: "span#drag-handler"});
+
     $("#reset-handler").on('click', function () {
-        $( "#info-area" ).animate({
+        $("#info-area").animate({
             left: "80px",
             top: "240px"
-        }, 500 );
+        }, 500);
     });
+
+    // Function
+    if (localStorage.getItem("showTip") === null) {
+        $('#keyword-input').tooltip({
+            'trigger': 'focus',
+            'placement': 'bottom',
+            'html': true,
+            'title': '<div>Qualified name is something like: <b>com.example.foobar.getMethod(Type)</b><br/>' +
+                'You can get it from Eclipse or STS in the context menu after selecting the method:</div></br>' +
+                '<img align="center" src="/static/get-qualified-name.png"> </br></br>' +
+                '<div><a id="do-not-show-tip" href="#">Don\'t show this again.</a></div>'
+        });
+        $('#keyword-input').on('shown.bs.tooltip', function () {
+            $("#do-not-show-tip").on('click', function () {
+                $('#keyword-input').tooltip('disable');
+                localStorage.setItem("showTip", "false");
+            });
+        });
+    }
+
     $("#collection-button").on('click', function () {
-        $('#system-modal').modal('show');
+        $('#collection-modal').modal('show');
     });
 
-    $("#info-func-btn-1").on('click', function () {
-        $("#keyword-input").val($('#info-qualified-name').text());
-    });
-
-
-
+    // Graph
     G6.registerNode(
         'method-card',
         {
-            drawShape:(cfg, group) =>{
-                const container = group.addShape('rect', {
+            drawShape: (cfg, group) => {
+                group.addShape('rect', {
                     attrs: {
                         x: 0,
                         y: 0,
@@ -108,12 +132,10 @@ $(document).ready(function(){
                 });
                 return group;
             }
-        },'rect');
+        }, 'rect');
 
-
-
-    let globalCalleeGraph = null;
-    let globalCallerGraph = null;
+    let globalCalleeGraph = {};
+    let globalCallerGraph = {};
     let calleeBiz = true;
     let apiLink = null;
 
@@ -121,10 +143,10 @@ $(document).ready(function(){
 
         $("#collection-button").prop("disabled", "disabled");
 
-        if($("#pills-caller-tab").hasClass('active') === true){
+        if ($("#pills-caller-tab").hasClass('active') === true) {
             apiLink = '/getCallerMethodInfo';
             calleeBiz = false;
-        }else{
+        } else {
             apiLink = '/getCalleeMethodInfo';
             calleeBiz = true;
         }
@@ -137,12 +159,12 @@ $(document).ready(function(){
                         methodQualifiedName: $("#keyword-input").val().trim()
                     },
                 success: function (data) {
-                    if(globalCalleeGraph !== null && calleeBiz){
-                        globalCalleeGraph.destroy();
-                        globalCalleeGraph = null;
-                    }else if(globalCallerGraph !== null && !calleeBiz){
-                        globalCallerGraph.destroy();
-                        globalCallerGraph = null;
+                    if (typeof globalCalleeGraph.graph !== 'undefined' && calleeBiz) {
+                        globalCalleeGraph.graph.destroy();
+                        globalCalleeGraph = {};
+                    } else if (typeof globalCallerGraph.graph !== 'undefined' && !calleeBiz) {
+                        globalCallerGraph.graph.destroy();
+                        globalCallerGraph = {};
                     }
                     const minimap = new Minimap({
                         size: [160, 160],
@@ -158,7 +180,7 @@ $(document).ready(function(){
                         height: document.getElementById(containerId).scrollHeight || window.innerHeight * 0.7,
                         defaultNode: {
                             shape: 'method-card',
-                            anchorPoints: [[ 0, 0.5 ], [ 1, 0.5 ]]
+                            anchorPoints: [[0, 0.5], [1, 0.5]]
                         },
                         defaultEdge: {
                             shape: 'cubic-horizontal'
@@ -171,7 +193,7 @@ $(document).ready(function(){
                                     data.collapsed = collapsed;
                                     return true;
                                 }
-                            }, 'drag-canvas', 'zoom-canvas' ]
+                            }, 'drag-canvas', 'zoom-canvas']
                         },
                         layout: {
                             type: 'compactBox',
@@ -197,68 +219,52 @@ $(document).ready(function(){
                     drawingGraph.on('node:contextmenu', ev => {
                         const classname = ev.target.get('className');
                         const item = ev.item;
-                        if(classname === '_id-hover-layer' && item){
+                        if (classname === '_id-hover-layer' && item) {
                             $("#info-qualified-name").text(item.getModel().methodQualifiedName);
                             $("#info-method-path").text(item.getModel().uiMethodPath);
                             $("#info-method-comment").text(item.getModel().uiMethodComment);
-                            $("#info-content").animate({ scrollTop: 0 }, "fast");
+                            $("#info-content").animate({scrollTop: 0}, "fast");
                         }
                     });
 
                     drawingGraph.refreshLayout(true);
 
-                    if(calleeBiz){
-                        globalCalleeGraph = drawingGraph;
-                    }else{
-                        globalCallerGraph = drawingGraph;
+                    if (calleeBiz) {
+                        globalCalleeGraph.graph = drawingGraph;
+                        globalCalleeGraph.coll = data.methodIndexMap;
+                    } else {
+                        globalCallerGraph.graph = drawingGraph;
+                        globalCallerGraph.coll = data.methodIndexMap;
                     }
 
                     let totalTime = 0;
-                    for(let key in data.calleeMethodIndexMap){
-                        $("#system-modal-info").html($("#system-modal-info").html() + "<br/>" + "Name: " + "<b>" + key + "</b>" +", Call times: " + "<b>" + data.calleeMethodIndexMap[key] + "<b>");
-                        totalTime += data.calleeMethodIndexMap[key];
+                    $("#collection-modal-info").html('');
+
+                    let workingCollDat = calleeBiz ? globalCalleeGraph.coll : globalCallerGraph.coll;
+                    for (let key in workingCollDat) {
+                        $("#collection-modal-info").html($("#collection-modal-info").html() + "<br/>" + "Name: " + "<b>" + key + "</b>" + ",Call times: " + "<b>" + workingCollDat[key] + "</b>");
+                        totalTime += workingCollDat[key];
                     }
-                    $("#system-modal-info").html($("#system-modal-info").html() + "<br/>" + "Total calls: " + "<b>" + totalTime +"</b>");
+                    $("#collection-modal-info").html($("#collection-modal-info").html() + "<hr/>" + "<span style='float: right;'>Total calls: " + "<b>" + totalTime + "</b></span>");
 
                     $("#collection-button").removeAttr("disabled");
-
                 },
                 error: function (e) {
-                    if(globalCalleeGraph !== null && calleeBiz){
-                        globalCalleeGraph.destroy();
-                        globalCalleeGraph = null;
-                    }else if(globalCallerGraph !== null && !calleeBiz){
-                        globalCallerGraph.destroy();
-                        globalCallerGraph = null;
+                    if (typeof globalCalleeGraph.graph !== 'undefined' && calleeBiz) {
+                        globalCalleeGraph.graph.destroy();
+                        globalCalleeGraph = {};
+                    } else if (typeof globalCallerGraph.graph !== 'undefined' && !calleeBiz) {
+                        globalCallerGraph.graph.destroy();
+                        globalCallerGraph = {};
                     }
 
-                    console.error('Error happened: ' + JSON.stringify(e.responseJSON));
-                    $("#system-modal-info").text(JSON.stringify(e.responseJSON));
+                    $("#system-modal-info").html("Something happened..." + "<br/>" + JSON.stringify(e.responseJSON));
                     $('#system-modal').modal('show');
-
                 }
             }
         )
 
     });
-
-    if (localStorage.getItem("showTip") === null) {
-        $('#keyword-input').tooltip({
-            'trigger': 'focus',
-            'placement': 'bottom',
-            'html': true,
-            'title': '<div>Qualified name is something like: <b>com.example.foobar.getMethod(Type)</b><br/>' +
-                'You can get it from Eclipse or STS in the context menu after selecting the method:</div></br>' +
-                '<img align="center" src="/static/get-qualified-name.png"> </br></br>' +
-                '<div><a id="do-not-show-tip" href="#">Don\'t show this again.</a></div>'
-        });
-        $('#keyword-input').on('shown.bs.tooltip', function () {
-            $("#do-not-show-tip").on('click', function () {
-                $('#keyword-input').tooltip('disable');
-                localStorage.setItem("showTip", "false");
-            });
-        });
-    }
 
 
 });

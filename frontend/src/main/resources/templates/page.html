@@ -25,7 +25,6 @@
         Copyright © 2019 i-solver Corporation<br/>
     </div>
 
-
     <div id="main-content" style="padding:2rem;">
         <div id="input-area" class="input-group input-group-lg">
             <div class="input-group-prepend">
@@ -58,7 +57,7 @@
             <hr/>
             <div class="tab-content" id="pills-tabContent">
                 <div id="info-area" style="left:80px;top:240px;">
-                    <div style="position: absolute;top: -1.2rem;background: white;left: -0.1rem;border: 2px solid gray;"><strong>&nbsp;&nbsp;Inspect panel&nbsp;&nbsp;</strong></div>
+                    <div style="position: absolute;top: -1.2rem;background: white;left: -0.1rem;border: 2px solid gray;"><strong>&nbsp;&nbsp;Inspector&nbsp;&nbsp;</strong></div>
                     <div id="info-content" style="padding: 0.4rem">
                         <div><strong>Qualified name: </strong><span id="info-qualified-name">Right click on node to get details.</span>
                         </div>
@@ -69,8 +68,6 @@
                     </div>
                     <div id="info-button-layer">
                         <button id="info-func-btn-1" type="button" class="btn btn-outline-primary btn-sm">SET Q</button>
-                        <button id="info-func-btn-2" type="button" class="btn btn-outline-primary btn-sm">CPY C</button>
-                        <button id="info-func-btn-3" type="button" class="btn btn-outline-primary btn-sm">CPY M</button>
                         <span id="reset-handler" style="right: 1.8rem; bottom: 0.4rem; position: absolute; cursor: pointer;" title="Reset window position"><i class="fas fa-ruler-combined"></i></span>
                         <span id="drag-handler" style="right: 0.4rem; bottom: 0.4rem; position: absolute; cursor: move;" title="Drag to move"><i class="fas fa-arrows-alt"></i></span>
                     </div>
@@ -85,16 +82,32 @@
         </div>
     </div>
 
-    <div class="modal fade" id="system-modal" tabindex="-1" role="dialog" style="font-size: 14px;">
+    <div class="modal fade" id="system-modal" tabindex="-1" role="dialog" style="font-size: 13px;">
         <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">DEBUG: System Information</h5>
+                    <h5 class="modal-title">System Information</h5>
                     <button type="button" class="close" data-dismiss="modal">
                         <span>&times;</span>
                     </button>
                 </div>
                 <div id="system-modal-info" class="modal-body"></div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="collection-modal" tabindex="-1" role="dialog" style="font-size: 13px;">
+        <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-xl" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Collection</h5>
+                    <button type="button" class="close" data-dismiss="modal">
+                        <span>&times;</span>
+                    </button>
+                </div>
+                <div id="collection-modal-info" class="modal-body"></div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                 </div>
