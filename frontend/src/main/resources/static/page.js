@@ -61,6 +61,20 @@ $(document).ready(function () {
         $('#collection-modal').modal('show');
     });
 
+    $("#reset-layout-button").on('click', function () {
+        if ($("#pills-caller-tab").hasClass('active') === true && typeof globalCallerGraph !== 'undefined' && typeof globalCallerGraph.graph !== 'undefined' ) {
+            globalCallerGraph.graph.refreshLayout(true);
+        } else if($("#pills-callee-tab").hasClass('active') === true && typeof globalCalleeGraph !== 'undefined' && typeof globalCalleeGraph.graph !== 'undefined' ){
+            globalCalleeGraph.graph.refreshLayout(true);
+        }
+        $("#info-area").animate({
+            left: "80px",
+            top: "240px",
+            width: "30rem",
+            height: "160px"
+        }, 500);
+    });
+
     $('a[data-toggle="pill"]').on('shown.bs.tab', function (e) {
         $("#collection-button").prop("disabled", "disabled");
         if (e.target.id === 'pills-caller-tab' && typeof globalCallerGraph !== 'undefined' && typeof globalCallerGraph.coll !== 'undefined') {
@@ -156,6 +170,8 @@ $(document).ready(function () {
     $("#search-button").on('click', function () {
 
         $("#collection-button").prop("disabled", "disabled");
+        $("#search-button").prop("disabled", "disabled");
+        $("#search-button").html('<span class="spinner-border spinner-border-sm" role="status"></span>Searching...');
 
         if ($("#pills-caller-tab").hasClass('active') === true) {
             apiLink = '/getCallerMethodInfo';
@@ -173,6 +189,7 @@ $(document).ready(function () {
                         methodQualifiedName: $("#keyword-input").val().trim()
                     },
                 success: function (data) {
+                    $("#search-button").html('<span class="spinner-border spinner-border-sm" role="status"></span>Rendering...');
                     if (typeof globalCalleeGraph.graph !== 'undefined' && calleeBiz) {
                         globalCalleeGraph.graph.destroy();
                         globalCalleeGraph = {};
@@ -205,6 +222,7 @@ $(document).ready(function () {
                                 onChange: function onChange(item, collapsed) {
                                     data = item.getModel();
                                     data.collapsed = collapsed;
+                                    collapseNode(data, collapsed);
                                     return true;
                                 }
                             }, 'drag-canvas', 'zoom-canvas']
@@ -254,6 +272,9 @@ $(document).ready(function () {
                     let workingCollDat = calleeBiz ? globalCalleeGraph.coll : globalCallerGraph.coll;
                     drawCollectionModelContent(workingCollDat);
                     $("#collection-button").removeAttr("disabled");
+
+                    $("#search-button").html('Search');
+                    $("#search-button").removeAttr("disabled");
                 },
                 error: function (e) {
                     if (typeof globalCalleeGraph.graph !== 'undefined' && calleeBiz) {
@@ -263,6 +284,9 @@ $(document).ready(function () {
                         globalCallerGraph.graph.destroy();
                         globalCallerGraph = {};
                     }
+
+                    $("#search-button").html('Search');
+                    $("#search-button").removeAttr("disabled");
 
                     $("#system-modal-info").html("Something happened..." + "<br/>" + JSON.stringify(e.responseJSON));
                     $('#system-modal').modal('show');
@@ -298,11 +322,15 @@ function drawCollectionModelContent(workingCollDat) {
     $("#collection-modal-info").html($("#collection-modal-info").html() + "<hr/>" + "<span style='float: right;'>Total calls: " + "<b>" + totalTime + "</b></span>");
 }
 
-
-
-
-
-
-
-
-
+function collapseNode(graphJson, collapsed) {
+    for(let key in graphJson) {
+        let element = graphJson[key];
+        if(element.length > 0 && typeof(element) == "object" || typeof(element) == "object") {
+            collapseNode(element);
+        } else {
+            if(key === 'collapsed'){
+                graphJson['collapsed'] = collapsed;
+            }
+        }
+    }
+}
