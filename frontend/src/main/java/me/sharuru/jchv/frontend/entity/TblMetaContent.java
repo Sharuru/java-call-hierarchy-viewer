@@ -16,7 +16,7 @@ import javax.persistence.*;
  */
 @Data
 @Entity
-@Table(name = "meta_proto_gamma")
+@Table(name = "meta_proto_delta")
 @NoArgsConstructor
 public class TblMetaContent {
 

@@ -16,7 +16,7 @@ div#watermark {
     height: 100%;
     opacity: 0.2;
     z-index: -10;
-    background: url('/static/jchv-bg.png') center center no-repeat ;
+    background: url('/static/jchv-bg.png') center center no-repeat;
     pointer-events: none;
 }
 
@@ -35,13 +35,13 @@ div#info-area {
     background: rgba(255, 255, 255, 0.9);
 }
 
-div#info-content{
+div#info-content {
     flex: 1;
     overflow-y: auto;
     word-break: break-all;
 }
 
-div#info-button-layer{
+div#info-button-layer {
     position: absolute;
     width: 100%;
     bottom: 0;
@@ -55,4 +55,8 @@ div#info-button-layer{
     top: 1rem;
     right: 1rem;
     background: rgba(255, 255, 255, 0.6);
+}
+
+.spinner-border {
+    vertical-align: baseline;
 }
