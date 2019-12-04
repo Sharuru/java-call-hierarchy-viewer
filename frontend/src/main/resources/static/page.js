@@ -1,7 +1,7 @@
 $(document).ready(function () {
 
     // Debug
-    $("#keyword-input").val('jp.co.toyotsu.jast.lx.lx09.web.lx09s0010.Lx09S0010Controller.lx09U0020Search(Lx09U0010Criteria, Lx09U0020Form, BindingResult, Pageable, Model)');
+    //$("#keyword-input").val('jp.co.toyotsu.jast.lx.lx09.web.lx09s0010.Lx09S0010Controller.lx09U0020Search(Lx09U0010Criteria, Lx09U0020Form, BindingResult, Pageable, Model)');
 
     // Inspector
     $('#info-func-btn-1').tooltip({
@@ -26,12 +26,15 @@ $(document).ready(function () {
         'title': 'Copy method without parameters'
     });
 
-    $("#info-area").draggable({cursor: "move", handle: "span#drag-handler"});
+    $("#info-area").draggable({cursor: "move", handle: "div#info-area-title"});
+    $("#info-area").resizable();
 
     $("#reset-handler").on('click', function () {
         $("#info-area").animate({
             left: "80px",
-            top: "240px"
+            top: "240px",
+            width: "30rem",
+            height: "160px"
         }, 500);
     });
 
@@ -56,6 +59,17 @@ $(document).ready(function () {
 
     $("#collection-button").on('click', function () {
         $('#collection-modal').modal('show');
+    });
+
+    $('a[data-toggle="pill"]').on('shown.bs.tab', function (e) {
+        $("#collection-button").prop("disabled", "disabled");
+        if (e.target.id === 'pills-caller-tab' && typeof globalCallerGraph !== 'undefined' && typeof globalCallerGraph.coll !== 'undefined') {
+            drawCollectionModelContent(globalCallerGraph.coll);
+            $("#collection-button").removeAttr("disabled");
+        } else if (e.target.id === 'pills-callee-tab' && typeof globalCalleeGraph !== 'undefined' && typeof globalCalleeGraph.coll !== 'undefined') {
+            drawCollectionModelContent(globalCalleeGraph.coll);
+            $("#collection-button").removeAttr("disabled");
+        }
     });
 
     // Graph
@@ -237,16 +251,8 @@ $(document).ready(function () {
                         globalCallerGraph.coll = data.methodIndexMap;
                     }
 
-                    let totalTime = 0;
-                    $("#collection-modal-info").html('');
-
                     let workingCollDat = calleeBiz ? globalCalleeGraph.coll : globalCallerGraph.coll;
-                    for (let key in workingCollDat) {
-                        $("#collection-modal-info").html($("#collection-modal-info").html() + "<br/>" + "Name: " + "<b>" + key + "</b>" + ",Call times: " + "<b>" + workingCollDat[key] + "</b>");
-                        totalTime += workingCollDat[key];
-                    }
-                    $("#collection-modal-info").html($("#collection-modal-info").html() + "<hr/>" + "<span style='float: right;'>Total calls: " + "<b>" + totalTime + "</b></span>");
-
+                    drawCollectionModelContent(workingCollDat);
                     $("#collection-button").removeAttr("disabled");
                 },
                 error: function (e) {
@@ -265,11 +271,32 @@ $(document).ready(function () {
         )
 
     });
-
-
 });
 
-
+function drawCollectionModelContent(workingCollDat) {
+    let totalTime = 0;
+    let rowCnt = 1;
+    let htmlContent = '<table class="table table-sm table-striped">' +
+        '  <thead>' +
+        '    <tr>' +
+        '      <th scope="col">#</th>' +
+        '      <th scope="col" style="width: 90%;">Method qualified name</th>' +
+        '      <th scope="col">Call times</th>' +
+        '    </tr>' +
+        '  </thead>' +
+        '  <tbody>';
+    for (let key in workingCollDat) {
+        htmlContent += '<tr>' +
+            '      <th scope="row">' + rowCnt + '</th>' +
+            '      <td>' + key + '</td>' +
+            '      <td style="text-align: right;">' + workingCollDat[key] + '</td>' +
+            '    </tr>';
+        rowCnt++;
+        totalTime += workingCollDat[key];
+    }
+    $("#collection-modal-info").html(htmlContent);
+    $("#collection-modal-info").html($("#collection-modal-info").html() + "<hr/>" + "<span style='float: right;'>Total calls: " + "<b>" + totalTime + "</b></span>");
+}
 
 
 
