@@ -14,14 +14,17 @@
 <div id="watermark"></div>
 <div id="content" style="padding:2rem;">
 
-    <div id="top-right-info" style="position: absolute; top:0.4rem; right: 0.4rem; font-size: 1px; color: gray; text-align: right;">
-        Tech Alpha Preview<br/>
+    <div id="top-right-info"
+         style="position: absolute; top:0.4rem; right: 0.4rem; font-size: 1px; color: gray; text-align: right;">
+        Tech Alpha Preview 20191204114609<br/>
         Table Gamma<br/>
     </div>
-    <div id="bottom-left-info" style="position: absolute; bottom:0.4rem; left: 0.4rem; font-size: 1px; color: gray; text-align: right;">
+    <div id="bottom-left-info"
+         style="position: absolute; bottom:0.4rem; left: 0.4rem; font-size: 1px; color: gray; text-align: right;">
         Java Call Hierarchy Viewer, aka JCHV, is powered by I-SOLVER iSolution Suite&trade;<br/>
     </div>
-    <div id="bottom-right-info" style="position: absolute; bottom:0.4rem; right: 0.4rem; font-size: 1px; color: gray; text-align: right;">
+    <div id="bottom-right-info"
+         style="position: absolute; bottom:0.4rem; right: 0.4rem; font-size: 1px; color: gray; text-align: right;">
         Copyright © 2019 i-solver Corporation<br/>
     </div>
 
@@ -42,22 +45,28 @@
                     <div class="col">
                         <ul class="nav nav-pills " id="pills-tab" role="tablist">
                             <li class="nav-item">
-                                <a class="nav-link" id="pills-caller-tab" data-toggle="pill" href="#pills-caller" role="tab">Caller</a>
+                                <a class="nav-link active" id="pills-caller-tab" data-toggle="pill" href="#pills-caller"
+                                   role="tab">Caller</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link active" id="pills-callee-tab" data-toggle="pill" href="#pills-callee" role="tab">Callee</a>
+                                <a class="nav-link" id="pills-callee-tab" data-toggle="pill" href="#pills-callee"
+                                   role="tab">Callee</a>
                             </li>
                         </ul>
                     </div>
                     <div class="col" style="text-align: right;">
-                        <button id="collection-button" type="button" class="btn btn-outline-primary" disabled>Collection</button>
+                        <button id="collection-button" type="button" class="btn btn-outline-primary" disabled>
+                            Collection
+                        </button>
                     </div>
                 </div>
             </div>
             <hr/>
             <div class="tab-content" id="pills-tabContent">
                 <div id="info-area" style="left:80px;top:240px;">
-                    <div style="position: absolute;top: -1.2rem;background: white;left: -0.1rem;border: 2px solid gray;"><strong>&nbsp;&nbsp;Inspector&nbsp;&nbsp;</strong></div>
+                    <div id="info-area-title"
+                         style="position: absolute;top: -1.2rem;background: white;left: -0.1rem;border: 2px solid gray;cursor: move;">
+                        <strong>&nbsp;&nbsp;Inspector&nbsp;&nbsp;</strong></div>
                     <div id="info-content" style="padding: 0.4rem">
                         <div><strong>Qualified name: </strong><span id="info-qualified-name">Right click on node to get details.</span>
                         </div>
@@ -68,14 +77,15 @@
                     </div>
                     <div id="info-button-layer">
                         <button id="info-func-btn-1" type="button" class="btn btn-outline-primary btn-sm">SET Q</button>
-                        <span id="reset-handler" style="right: 1.8rem; bottom: 0.4rem; position: absolute; cursor: pointer;" title="Reset window position"><i class="fas fa-ruler-combined"></i></span>
-                        <span id="drag-handler" style="right: 0.4rem; bottom: 0.4rem; position: absolute; cursor: move;" title="Drag to move"><i class="fas fa-arrows-alt"></i></span>
+                        <span id="reset-handler"
+                              style="right: 1.8rem; bottom: 0.4rem; position: absolute; cursor: pointer;"
+                              title="Reset panel size&position"><i class="fas fa-ruler-combined"></i></span>
                     </div>
                 </div>
-                <div class="tab-pane fade" id="pills-caller" role="tabpanel">
+                <div class="tab-pane fade show active" id="pills-caller" role="tabpanel">
                     <div id="caller-graph-container"></div>
                 </div>
-                <div class="tab-pane fade show active" id="pills-callee" role="tabpanel">
+                <div class="tab-pane fade" id="pills-callee" role="tabpanel">
                     <div id="callee-graph-container"></div>
                 </div>
             </div>
@@ -124,7 +134,7 @@
 <script th:src="@{/static/minimap.js}"></script>
 <script th:src="@{/static/page.js}"></script>
 <script>
-    $(document).ready(function(){
+    $(document).ready(function () {
 
     });
 
