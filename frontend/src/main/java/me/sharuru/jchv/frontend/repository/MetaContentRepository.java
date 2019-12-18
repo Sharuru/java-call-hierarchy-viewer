@@ -20,4 +20,7 @@ public interface MetaContentRepository extends JpaRepository<TblMetaContent, Lon
 
     @Query(value = "SELECT c FROM TblMetaContent c WHERE c.methodCalleeQualifiedName = :methodCalleeQualifiedName AND c.methodType <> 'BASE' ORDER BY c.id ASC")
     List<TblMetaContent> findCallerByMethodCalleeQualifiedName(@Param("methodCalleeQualifiedName") String methodCalleeQualifiedName);
+
+    @Query(value = "SELECT c FROM TblMetaContent c WHERE (c.methodCalleeClass = :methodCalleeClass OR :methodCalleeClass = '') AND (c.methodCalleeMethod = :methodCalleeMethod OR :methodCalleeMethod = '') AND c.methodType = 'BASE' ORDER BY c.id ASC")
+    List<TblMetaContent> findQualifiedBySimpleName(@Param("methodCalleeClass") String methodCalleeClass, @Param("methodCalleeMethod") String methodCalleeMethod);
 }

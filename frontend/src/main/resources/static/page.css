@@ -10,15 +10,15 @@ div.tooltip-inner > div:nth-child(6) {
     text-align: right;
 }
 
-div#watermark {
-    position: fixed;
-    width: 100%;
-    height: 100%;
-    opacity: 0.2;
-    z-index: -10;
-    background: url('/static/jchv-bg.png') center center no-repeat;
-    pointer-events: none;
-}
+/*div#watermark {*/
+/*    position: fixed;*/
+/*    width: 100%;*/
+/*    height: 100%;*/
+/*    opacity: 0.2;*/
+/*    z-index: -10;*/
+/*    background: url('/static/jchv-bg.png') center center no-repeat;*/
+/*    pointer-events: none;*/
+/*}*/
 
 div#info-area {
     display: flex;

@@ -7,11 +7,9 @@ import me.sharuru.jchv.frontend.model.TreeGraphNode;
 import me.sharuru.jchv.frontend.repository.MetaContentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Business service
@@ -129,6 +127,45 @@ public class MetaContentService {
 
             return response;
         }
+    }
+
+    /**
+     * Get qualified name by method simple name
+     *
+     * @param methodSimpleClass method simple name
+     * @param methodSimpleMethod method simple name
+     * @return information result
+     */
+    public BusinessApiResponse getQualifiedNames(String methodSimpleClass, String methodSimpleMethod) {
+        BusinessApiResponse response = new BusinessApiResponse();
+
+
+        if (StringUtils.isEmpty(methodSimpleClass) && StringUtils.isEmpty(methodSimpleMethod)) {
+            throw new RuntimeException("Transferred value is not acceptable.");
+        }
+
+        List<TblMetaContent> queryResult = metaContentRepository.findQualifiedBySimpleName(methodSimpleClass, methodSimpleMethod);
+
+        if (queryResult.isEmpty()) {
+            throw new RuntimeException("Matched qualified name is not found: " + methodSimpleClass + ", " + methodSimpleMethod);
+        }
+
+        List<TreeGraphNode> results = new ArrayList<>();
+
+        queryResult.forEach(result -> {
+            TreeGraphNode node = new TreeGraphNode();
+            node.setId(result.getId());
+            node.setMethodQualifiedName(result.getMethodCalleeQualifiedName());
+            node.setMethodPath(result.getMethodPath());
+            node.setMethodType(result.getMethodType());
+            node.setMethodComment(result.getMethodComment());
+            results.add(node);
+        });
+
+        response.getTreeGraphData().getChildren().addAll(results);
+        response.setBizCode(200L);
+
+        return response;
     }
 
     /**

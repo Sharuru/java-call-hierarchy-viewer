@@ -180,13 +180,21 @@ $(document).ready(function () {
             apiLink = '/getCalleeMethodInfo';
             calleeBiz = true;
         }
+
+        let inputVal = $("#keyword-input").val().trim();
+        if(inputVal.lastIndexOf('RepositoryImpl.') !== -1){
+            inputVal = inputVal.replace('RepositoryImpl.', 'RepositoryCustom.');
+            $("#keyword-input").val(inputVal);
+            $("#bottom-right-toast").toast('show');
+        }
+
         $.ajax({
                 url: apiLink,
                 type: "get",
                 contentType: "application/json",
                 data:
                     {
-                        methodQualifiedName: $("#keyword-input").val().trim()
+                        methodQualifiedName: inputVal
                     },
                 success: function (data) {
                     $("#search-button").html('<span class="spinner-border spinner-border-sm" role="status"></span>Rendering...');
@@ -295,6 +303,62 @@ $(document).ready(function () {
         )
 
     });
+
+    $("#name-search-button").on('click', function(){
+        $("#name-search-button").prop("disabled", "disabled");
+        $("#name-search-button").text('Matching...');
+
+        $.ajax({
+            url: '/getQualifiedNames',
+            type: 'get',
+            contentType: 'application/json',
+            data:
+                {
+                    methodSimpleClass: $('#method-keyword-input-class').val().trim(),
+                    methodSimpleMethod: $('#method-keyword-input-method').val().trim()
+                },
+            success: function (data) {
+                $("#name-search-button").removeAttr("disabled");
+                $("#name-search-button").text('Find qualified name');
+
+                let rowCnt = 1;
+                let htmlContent = '<table class="table table-sm table-striped table-hover">' +
+                    '  <thead>' +
+                    '    <tr>' +
+                    '      <th scope="col">#</th>' +
+                    '      <th scope="col">Operation</th>' +
+                    '      <th scope="col">Method details</th>' +
+                    '    </tr>' +
+                    '  </thead>' +
+                    '  <tbody>';
+
+                for (let key in data.treeGraphData.children) {
+                    htmlContent += '<tr>' +
+                        '      <th scope="row">' + rowCnt + '</th>' +
+                        '      <td>' + '<button type="button" class="btn btn-primary btn-sm" onclick="$(\'#keyword-input\').val(\''+ data.treeGraphData.children[key].methodQualifiedName +'\');$(\'#name-helper-modal\').modal(\'hide\');">Select</button>' + '</td>' +
+                        '      <td style="white-space: pre-line">' + '<b>' + data.treeGraphData.children[key].methodQualifiedName + '</b>' +
+                                    '<br/>' +
+                                    data.treeGraphData.children[key].methodComment + '</td>' +
+                        '    </tr>';
+                    rowCnt++;
+                }
+
+                $("#name-helper-modal-info").html(htmlContent);
+
+
+            },
+            error: function (e) {
+                $("#name-search-button").removeAttr("disabled");
+                $("#name-search-button").text('Find qualified name');
+
+                $("#name-helper-modal-info").html('');
+                $("#system-modal-info").html("Something happened..." + "<br/>" + JSON.stringify(e.responseJSON));
+                $('#system-modal').modal('show');
+            }
+        })
+
+    });
+
 });
 
 function drawCollectionModelContent(workingCollDat) {

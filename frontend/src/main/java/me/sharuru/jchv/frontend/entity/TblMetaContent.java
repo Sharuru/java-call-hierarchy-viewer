@@ -16,7 +16,7 @@ import javax.persistence.*;
  */
 @Data
 @Entity
-@Table(name = "meta_proto_delta")
+@Table(name = "meta_proto_gamma")
 @NoArgsConstructor
 public class TblMetaContent {
 
@@ -63,4 +63,16 @@ public class TblMetaContent {
      */
     @Column(name = "method_callee_seq")
     private Long methodCalleeSeq;
+
+    /**
+     * Method self class name(used for autocomplete)
+     */
+    @Column(name = "method_callee_class")
+    private String methodCalleeClass;
+
+    /**
+     * Method self method name(used for autocomplete)
+     */
+    @Column(name = "method_callee_method")
+    private String methodCalleeMethod;
 }

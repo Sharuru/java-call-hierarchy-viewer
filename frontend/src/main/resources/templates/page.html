@@ -13,11 +13,14 @@
 <body>
 <div id="watermark"></div>
 <div id="content" style="padding:2rem;">
-
+    <div id="top-left-info"
+         style="position: absolute; top:0.4rem; left: 0.4rem; font-size: 1px; color: gray; text-align: right;">
+        <img src="../../static/jchv-bg.png" style="width: 10rem;">
+    </div>
     <div id="top-right-info"
          style="position: absolute; top:0.4rem; right: 0.4rem; font-size: 1px; color: gray; text-align: right;">
-        Tech Alpha Preview 20191204143806<br/>
-        Table Delta<br/>
+        Tech Beta 20191218123218<br/>
+        Table Gamma+<br/>
     </div>
     <div id="bottom-left-info"
          style="position: absolute; bottom:0.4rem; left: 0.4rem; font-size: 1px; color: gray; text-align: right;">
@@ -26,6 +29,18 @@
     <div id="bottom-right-info"
          style="position: absolute; bottom:0.4rem; right: 0.4rem; font-size: 1px; color: gray; text-align: right;">
         Copyright © 2019 i-solver Corporation<br/>
+    </div>
+    <div id="bottom-right-toast" class="toast" style="position: absolute; bottom: 0.4rem; right: 0.4rem; z-index: 10" data-delay="3000">
+        <div class="toast-header">
+            <svg class="bd-placeholder-img rounded mr-2" width="20" height="20" xmlns="http://www.w3.org/2000/svg"
+                 preserveAspectRatio="xMidYMid slice" focusable="false" role="img">
+                <rect width="100%" height="100%" fill="#007aff"></rect>
+            </svg>
+            <strong class="mr-auto">Auto replacement activated</strong>
+        </div>
+        <div class="toast-body">
+            *RepositoryImpl -> *RepositoryCustom
+        </div>
     </div>
 
     <div id="main-content" style="padding:2rem;">
@@ -55,6 +70,7 @@
                         </ul>
                     </div>
                     <div class="col" style="text-align: right;">
+                        <button id="name-helper-button" type="button" class="btn btn-outline-primary" data-toggle="modal" data-target="#name-helper-modal">Name helper</button>
                         <button id="reset-layout-button" type="button" class="btn btn-outline-primary">Reset layout</button>
                         <button id="collection-button" type="button" class="btn btn-outline-primary" disabled>Collection</button>
                     </div>
@@ -89,9 +105,17 @@
                 </div>
             </div>
         </div>
+
+
+
+
+
     </div>
 
-    <div class="modal fade" id="system-modal" tabindex="-1" role="dialog" style="font-size: 13px;">
+
+
+
+    <div class="modal fade" id="system-modal" tabindex="-1" role="dialog" style="font-size: 13px; z-index: 2000;">
         <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -117,6 +141,37 @@
                     </button>
                 </div>
                 <div id="collection-modal-info" class="modal-body"></div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="name-helper-modal" tabindex="-1" role="dialog" style="font-size: 13px;">
+        <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-xl" role="document">
+            <div class="modal-content" style="min-height:80%;">
+                <div class="modal-header">
+                    <h5 class="modal-title">Name helper</h5>
+                    <button type="button" class="close" data-dismiss="modal">
+                        <span>&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div id="name-input-area" class="input-group input-group-sm">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" id="inputGroup-sizing-sm"><i class="fas fa-search"></i></span>
+                        </div>
+                        <input id="method-keyword-input-class" type="text" class="form-control" placeholder="Enter class name here...">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" id="inputGroup-sizing-sm-hashtag">#</span>
+                        </div>
+                        <input id="method-keyword-input-method" type="text" class="form-control" placeholder="Enter method name here...">
+                        <div class="input-group-append">
+                            <button id="name-search-button" type="button" class="btn btn-primary btn-lg">Find qualified name</button>
+                        </div>
+                    </div>
+                    <div id="name-helper-modal-info" style="padding-top: 1rem; "></div>
+                </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                 </div>

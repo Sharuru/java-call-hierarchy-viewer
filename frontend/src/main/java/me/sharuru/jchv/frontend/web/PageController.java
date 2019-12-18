@@ -4,7 +4,6 @@ import me.sharuru.jchv.frontend.model.BusinessApiResponse;
 import me.sharuru.jchv.frontend.service.MetaContentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -51,5 +50,18 @@ public class PageController {
     @ResponseBody
     public BusinessApiResponse getCallerMethodInfo(@RequestParam String methodQualifiedName) {
         return metaContentService.getCallerMethodInfo(methodQualifiedName);
+    }
+
+    /**
+     * Endpoint of name helper
+     *
+     * @param methodSimpleClass  query keyword
+     * @param methodSimpleMethod query keyword
+     * @return query result
+     */
+    @RequestMapping("/getQualifiedNames")
+    @ResponseBody
+    public BusinessApiResponse getQualifiedNames(@RequestParam(required = false) String methodSimpleClass, @RequestParam(required = false) String methodSimpleMethod) {
+        return metaContentService.getQualifiedNames(methodSimpleClass, methodSimpleMethod);
     }
 }
