@@ -109,7 +109,8 @@ public class SettingShell extends Shell {
                 sharedData.getLogText()
                         .append("Setting updated. URL=" + urlText.getText().trim() + ", USERNAME="
                                 + usernameText.getText().trim() + ", PASSWORD="
-                                + passwordText.getText().trim() + ", TABLENAME=" + tableNameTxt.getText().trim());
+                                + passwordText.getText().trim() + ", TABLENAME="
+                                + tableNameTxt.getText().trim());
                 settingShell.dispose();
             }
         });
@@ -126,15 +127,15 @@ public class SettingShell extends Shell {
         });
         cancelSettingButton.setText("Cancel");
         cancelSettingButton.setBounds(359, 274, 75, 25);
-        
+
         Group grpOtherSettings = new Group(this, SWT.NONE);
         grpOtherSettings.setText("Other Settings");
         grpOtherSettings.setBounds(10, 144, 424, 72);
-        
+
         Label lblTableName = new Label(grpOtherSettings, SWT.NONE);
         lblTableName.setText("TABLE NAME");
         lblTableName.setBounds(20, 23, 70, 15);
-        
+
         tableNameTxt = new Text(grpOtherSettings, SWT.BORDER);
         tableNameTxt.setText("meta_proto_delta");
         tableNameTxt.setBounds(96, 20, 318, 21);
@@ -148,7 +149,7 @@ public class SettingShell extends Shell {
         setText("PST Settings");
         setSize(450, 338);
     }
-    
+
     @Override
     protected void checkSubclass() {
         // Disable the check that prevents subclassing of SWT components

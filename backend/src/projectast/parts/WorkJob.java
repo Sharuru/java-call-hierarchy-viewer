@@ -40,11 +40,12 @@ import projectast.views.PSTView.SharedData;
 public class WorkJob {
 
     public SharedData sharedData;
-    
-    //private List<String> tgtProjNames = Arrays.asList("lj-common", "lj-dev-entity", "lj-domain", "lj-entity", "lj-share", "lj-web", "lj-webapp");
-    
+
+    // private List<String> tgtProjNames = Arrays.asList("lj-common", "lj-dev-entity", "lj-domain",
+    // "lj-entity", "lj-share", "lj-web", "lj-webapp");
+
     private List<String> tgtExtNames = Arrays.asList(".java");
-    
+
     public Object execute(SharedData sharedData) throws ExecutionException {
         this.sharedData = sharedData;
         printMsg(System.currentTimeMillis() + "START");
@@ -54,10 +55,10 @@ public class WorkJob {
         for (IProject project : projects) {
             try {
                 printMsg("Entering " + project.getName() + "...");
-                //if(project.getName().startsWith("lj")){
-                //if(tgtProjNames.contains(project.getName())){
-                    getProjectInfo(project);
-                //}
+                // if(project.getName().startsWith("lj")){
+                // if(tgtProjNames.contains(project.getName())){
+                getProjectInfo(project);
+                // }
             } catch (CoreException e) {
                 e.printStackTrace();
             }
@@ -66,7 +67,7 @@ public class WorkJob {
         return null;
     }
 
-    private void getProjectInfo(IProject project) throws CoreException, JavaModelException {        
+    private void getProjectInfo(IProject project) throws CoreException, JavaModelException {
         IJavaProject javaProject = JavaCore.create(project);
         getPackageInfo(javaProject);
     }
@@ -81,16 +82,16 @@ public class WorkJob {
             }
         }
     }
-    
+
     private void getCompilationUnitDetails(ICompilationUnit unit) throws JavaModelException {
         String lowcasedElementName = unit.getElementName().toLowerCase();
         String extName = lowcasedElementName.substring(lowcasedElementName.lastIndexOf('.'));
-        if(tgtExtNames.contains(extName)){
+        if (tgtExtNames.contains(extName)) {
             String fileName = unit.getElementName().toLowerCase();
             if (!fileName.endsWith("model.java") && !fileName.endsWith("criteria.java")
                     && !fileName.endsWith("selectoptions.java") && !fileName.endsWith("dto.java")
                     && !fileName.endsWith("result.java") && !fileName.endsWith("post.java")) {
-                getIMethods(unit);    
+                getIMethods(unit);
             }
         }
     }
@@ -114,14 +115,14 @@ public class WorkJob {
                 HashSet<IMethod> calleeMethods = getIMethods(mw2);
                 callees.addAll(calleeMethods);
             }
-            
+
             //
             String newParamStr = "";
             String comma = "";
             String[] parameterTypes = method.getParameterTypes();
             try {
                 String[] parameterNames = method.getParameterNames();
-                for (int i=0; i<method.getParameterTypes().length; ++i) {
+                for (int i = 0; i < method.getParameterTypes().length; ++i) {
                     newParamStr = newParamStr.concat(comma);
                     newParamStr = newParamStr.concat(Signature.toString(parameterTypes[i]));
                     newParamStr = newParamStr.concat(" ");
@@ -130,12 +131,13 @@ public class WorkJob {
                 }
             } catch (JavaModelException e) {
                 printMsg(e.getMessage());
-            }           
+            }
             //
-                       
-            printMsg("Method: " + method.getPath() + "#" + method.getElementName() + "(" + newParamStr + ")"
-                    + " is calling following methods:");
-            String methodPath =   method.getPath() + "#" + method.getElementName() +  "(" + newParamStr + ")";
+
+            printMsg("Method: " + method.getPath() + "#" + method.getElementName() + "("
+                    + newParamStr + ")" + " is calling following methods:");
+            String methodPath =
+                    method.getPath() + "#" + method.getElementName() + "(" + newParamStr + ")";
             String methodType = "";
             String methodCallee = "";
             String methodComment = "";
@@ -161,15 +163,16 @@ public class WorkJob {
             Connection conn = null;
             try {
                 conn = DriverManager.getConnection(url, user, password);
-            }
-            catch (SQLException e) {
+            } catch (SQLException e) {
                 e.printStackTrace();
             }
-                      
+
             String methodqualifiedName = getMethodFullName(method);
             methodPath = methodPath.substring(1);
-            String BASESQL = "INSERT INTO " + tableName + "(method_qualified_name, method_path, method_comment, method_type, method_callee_qualified_name, method_callee_seq) VALUES (";
-            BASESQL += "'" + methodqualifiedName + "','" + methodPath + "','" + methodComment + "','" + "BASE" + "','" + methodqualifiedName + "','" + "0" + "')";
+            String BASESQL = "INSERT INTO " + tableName
+                    + "(method_qualified_name, method_path, method_comment, method_type, method_callee_qualified_name, method_callee_seq) VALUES (";
+            BASESQL += "'" + methodqualifiedName + "','" + methodPath + "','" + methodComment
+                    + "','" + "BASE" + "','" + methodqualifiedName + "','" + "0" + "')";
             try {
                 conn.prepareStatement(BASESQL).executeUpdate();
             } catch (SQLException e) {
@@ -178,23 +181,24 @@ public class WorkJob {
             }
             int methodCalleeSeq = 1;
             for (IMethod callee : callees) {
-                
+
                 //
                 String newCalleeParamStr = "";
                 String calleeComma = "";
                 String[] calleeParameterTypes = callee.getParameterTypes();
                 try {
                     String[] calleeParameterNames = callee.getParameterNames();
-                    for (int i=0; i<callee.getParameterTypes().length; ++i) {
+                    for (int i = 0; i < callee.getParameterTypes().length; ++i) {
                         newCalleeParamStr = newCalleeParamStr.concat(calleeComma);
-                        newCalleeParamStr = newCalleeParamStr.concat(Signature.toString(calleeParameterTypes[i]));
+                        newCalleeParamStr = newCalleeParamStr
+                                .concat(Signature.toString(calleeParameterTypes[i]));
                         newCalleeParamStr = newCalleeParamStr.concat(" ");
                         newCalleeParamStr = newCalleeParamStr.concat(calleeParameterNames[i]);
                         calleeComma = ", ";
                     }
                 } catch (JavaModelException e) {
                     printMsg(e.getMessage());
-                }           
+                }
                 //
                 String methodCalleeComment = "";
 
@@ -216,7 +220,7 @@ public class WorkJob {
                             str = str.replaceAll("\\.", "/");
                         }
                         binPath = str + "/" + binPath;
-                        if(str.endsWith(".jar")) {
+                        if (str.endsWith(".jar")) {
                             break;
                         }
                     }
@@ -225,23 +229,25 @@ public class WorkJob {
                     binPath = binPath + "(" + newCalleeParamStr + ")";
                     methodType = "BIN";
                     methodCallee = binPath;
-                    
+
                 } else {
                     String path = callee.getPath() + "#" + callee.getElementName();
                     if (!(method.getPath() + "#" + method.getElementName()).equals(path)) {
                         methodType = "SRC";
-                        methodCallee = callee.getPath() + "#" + callee.getElementName() + "(" + newCalleeParamStr + ")";
+                        methodCallee = callee.getPath() + "#" + callee.getElementName() + "("
+                                + newCalleeParamStr + ")";
                     } else {
                         methodType = "LOOP-SRC";
-                        methodCallee = callee.getPath() + "#" + callee.getElementName() + "(" + newCalleeParamStr + ")";
+                        methodCallee = callee.getPath() + "#" + callee.getElementName() + "("
+                                + newCalleeParamStr + ")";
                     }
                     methodCallee = methodCallee.substring(1);
                     ISourceRange calleeJavadocRange = callee.getJavadocRange();
                     IBuffer calleeBuf = callee.getOpenable().getBuffer();
                     if (calleeJavadocRange != null) {
-                        JavaDocCommentReader calleeReader =
-                                new JavaDocCommentReader(calleeBuf, calleeJavadocRange.getOffset(),
-                                        calleeJavadocRange.getOffset() + calleeJavadocRange.getLength() - 1);
+                        JavaDocCommentReader calleeReader = new JavaDocCommentReader(calleeBuf,
+                                calleeJavadocRange.getOffset(), calleeJavadocRange.getOffset()
+                                        + calleeJavadocRange.getLength() - 1);
                         if (!containsOnlyInheritDoc(calleeReader, calleeJavadocRange.getLength())) {
                             calleeReader.reset();
                         }
@@ -254,8 +260,11 @@ public class WorkJob {
                 }
                 String methodCalleequalifiedName = getMethodFullName(callee);
                 String SQL = "";
-                SQL = "INSERT INTO" + tableName + "(method_qualified_name, method_path, method_comment, method_type, method_callee_qualified_name, method_callee_seq) VALUES (";
-                SQL += "'" + methodqualifiedName + "','" + methodCallee + "','" + methodCalleeComment + "','" + methodType + "','" + methodCalleequalifiedName + "','" + methodCalleeSeq + "')";
+                SQL = "INSERT INTO" + tableName
+                        + "(method_qualified_name, method_path, method_comment, method_type, method_callee_qualified_name, method_callee_seq) VALUES (";
+                SQL += "'" + methodqualifiedName + "','" + methodCallee + "','"
+                        + methodCalleeComment + "','" + methodType + "','"
+                        + methodCalleequalifiedName + "','" + methodCalleeSeq + "')";
                 try {
                     conn.prepareStatement(SQL).executeUpdate();
                 } catch (SQLException e) {
@@ -263,7 +272,7 @@ public class WorkJob {
                     printMsg(e.getMessage());
                 }
                 methodCalleeSeq++;
-            }    
+            }
 
             try {
                 conn.close();
@@ -273,6 +282,7 @@ public class WorkJob {
             }
         }
     }
+
     private static boolean containsOnlyInheritDoc(Reader reader, int length) {
         char[] content = new char[length];
         try {
@@ -306,42 +316,41 @@ public class WorkJob {
         }
         return null;
     }
-    
+
     private void printMsg(String msg) {
         System.out.println(msg);
-        
+
         sharedData.getUiSyncThread().asyncExec(() -> {
             sharedData.getLogText().append(msg + "\n");
-            if(sharedData.getLogText().getLineCount() > 10000) {
+            if (sharedData.getLogText().getLineCount() > 10000) {
                 sharedData.getLogText().setText("LOG CLEARED \n");
             }
         });
     }
-    
-    private String getMethodFullName(IMethod iMethod)
-    {
-            StringBuilder name = new StringBuilder();
-            name.append(iMethod.getDeclaringType().getFullyQualifiedName());
-            name.append(".");
-            name.append(iMethod.getElementName());
-            name.append("(");
 
-            String comma = "";
-            String[] parameterTypes = iMethod.getParameterTypes();
-            try {
-                String[] parameterNames = iMethod.getParameterNames();
-                for (int i=0; i<iMethod.getParameterTypes().length; ++i) {
-                    name.append(comma);
-                    name.append(Signature.toString(parameterTypes[i]));
-                    comma = ", ";
-                }
-            } catch (JavaModelException e) {
-                printMsg(e.getMessage());
+    private String getMethodFullName(IMethod iMethod) {
+        StringBuilder name = new StringBuilder();
+        name.append(iMethod.getDeclaringType().getFullyQualifiedName());
+        name.append(".");
+        name.append(iMethod.getElementName());
+        name.append("(");
+
+        String comma = "";
+        String[] parameterTypes = iMethod.getParameterTypes();
+        try {
+            String[] parameterNames = iMethod.getParameterNames();
+            for (int i = 0; i < iMethod.getParameterTypes().length; ++i) {
+                name.append(comma);
+                name.append(Signature.toString(parameterTypes[i]));
+                comma = ", ";
             }
+        } catch (JavaModelException e) {
+            printMsg(e.getMessage());
+        }
 
-            name.append(")");
+        name.append(")");
 
-            return name.toString();
+        return name.toString();
     }
 
 

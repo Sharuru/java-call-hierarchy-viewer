@@ -86,7 +86,7 @@ public class PSTView extends ViewPart {
         settingAction.setText("PST Settings...");
         settingAction.setImageDescriptor(
                 workbench.getSharedImages().getImageDescriptor(ISharedImages.IMG_OBJ_FILE));
-        
+
         clearLogAction = new Action() {
             @Override
             public void run() {
@@ -118,7 +118,7 @@ public class PSTView extends ViewPart {
         viewShell.setFocus();
     }
 
-    
+
     public class SharedData {
         private String jdbcUrl = "";
         private String jdbcUsername = "";
@@ -127,56 +127,70 @@ public class PSTView extends ViewPart {
         private PSTView pstView;
         private Text logText;
         private UISynchronize uiSyncThread;
-        
+
         public SharedData(PSTView pstView) {
             this.pstView = pstView;
             this.logText = pstView.logText;
             this.uiSyncThread = pstView.uiSyncThread;
-            
+
         }
+
         public String getJdbcUrl() {
             return jdbcUrl;
         }
+
         public void setJdbcUrl(String jdbcUrl) {
             this.jdbcUrl = jdbcUrl;
         }
+
         public String getJdbcUsername() {
             return jdbcUsername;
         }
+
         public void setJdbcUsername(String jdbcUsername) {
             this.jdbcUsername = jdbcUsername;
         }
+
         public String getJdbcPassword() {
             return jdbcPassword;
         }
+
         public void setJdbcPassword(String jdbcPassword) {
             this.jdbcPassword = jdbcPassword;
         }
+
         public Text getLogText() {
             return logText;
         }
+
         public void setLogText(Text logText) {
             this.logText = logText;
         }
+
         public PSTView getPstView() {
             return pstView;
         }
+
         public void setPstView(PSTView pstView) {
             this.pstView = pstView;
         }
+
         public UISynchronize getUiSyncThread() {
             return uiSyncThread;
         }
+
         public void setUiSyncThread(UISynchronize uiSyncThread) {
             this.uiSyncThread = uiSyncThread;
         }
+
         public String getTableName() {
             return tableName;
         }
+
         public void setTableName(String tableName) {
             this.tableName = tableName;
         }
     }
-    
-    
+
+
 }
