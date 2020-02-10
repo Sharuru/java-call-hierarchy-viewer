@@ -1,8 +1,5 @@
 $(document).ready(function () {
 
-    // Debug
-    //$("#keyword-input").val('jp.co.toyotsu.jast.lx.lx09.web.lx09s0010.Lx09S0010Controller.lx09U0020Search(Lx09U0010Criteria, Lx09U0020Form, BindingResult, Pageable, Model)');
-
     // Inspector
     $('#info-func-btn-1').tooltip({
         'trigger': 'hover',
@@ -37,25 +34,6 @@ $(document).ready(function () {
             height: "160px"
         }, 500);
     });
-
-    // Function
-    if (localStorage.getItem("showTip") === null) {
-        $('#keyword-input').tooltip({
-            'trigger': 'focus',
-            'placement': 'bottom',
-            'html': true,
-            'title': '<div>Qualified name is something like: <b>com.example.foobar.getMethod(Type)</b><br/>' +
-                'You can get it from Eclipse or STS in the context menu after selecting the method:</div></br>' +
-                '<img align="center" src="/static/get-qualified-name.png"> </br></br>' +
-                '<div><a id="do-not-show-tip" href="#">Don\'t show this again.</a></div>'
-        });
-        $('#keyword-input').on('shown.bs.tooltip', function () {
-            $("#do-not-show-tip").on('click', function () {
-                $('#keyword-input').tooltip('disable');
-                localStorage.setItem("showTip", "false");
-            });
-        });
-    }
 
     $("#collection-button").on('click', function () {
         $('#collection-modal').modal('show');
@@ -182,11 +160,6 @@ $(document).ready(function () {
         }
 
         let inputVal = $("#keyword-input").val().trim();
-        if(inputVal.lastIndexOf('RepositoryImpl.') !== -1){
-            inputVal = inputVal.replace('RepositoryImpl.', 'RepositoryCustom.');
-            $("#keyword-input").val(inputVal);
-            $("#bottom-right-toast").toast('show');
-        }
 
         $.ajax({
                 url: apiLink,

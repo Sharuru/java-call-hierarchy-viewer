@@ -18,9 +18,9 @@ public interface MetaContentRepository extends JpaRepository<TblMetaContent, Lon
     @Query(value = "SELECT c FROM TblMetaContent c WHERE c.methodQualifiedName = :methodQualifiedName ORDER BY c.methodCalleeSeq ASC")
     List<TblMetaContent> findCalleeByMethodQualifiedName(@Param("methodQualifiedName") String methodQualifiedName);
 
-    @Query(value = "SELECT c FROM TblMetaContent c WHERE c.methodCalleeQualifiedName = :methodCalleeQualifiedName AND c.methodType <> 'BASE' ORDER BY c.id ASC")
+    @Query(value = "SELECT c FROM TblMetaContent c WHERE c.methodCalleeQualifiedName = :methodCalleeQualifiedName AND c.methodType <> 'BASE' AND c.methodType <> 'ITFS' ORDER BY c.id ASC")
     List<TblMetaContent> findCallerByMethodCalleeQualifiedName(@Param("methodCalleeQualifiedName") String methodCalleeQualifiedName);
 
-    @Query(value = "SELECT c FROM TblMetaContent c WHERE (c.methodCalleeClass = :methodCalleeClass OR :methodCalleeClass = '') AND (c.methodCalleeMethod = :methodCalleeMethod OR :methodCalleeMethod = '') AND c.methodType = 'BASE' ORDER BY c.id ASC")
+    @Query(value = "SELECT c FROM TblMetaContent c WHERE (c.methodCalleeClass = :methodCalleeClass OR :methodCalleeClass = '') AND (c.methodCalleeMethod = :methodCalleeMethod OR :methodCalleeMethod = '') AND (c.methodType = 'BASE' OR c.methodType = 'ITFS') ORDER BY c.id ASC")
     List<TblMetaContent> findQualifiedBySimpleName(@Param("methodCalleeClass") String methodCalleeClass, @Param("methodCalleeMethod") String methodCalleeMethod);
 }

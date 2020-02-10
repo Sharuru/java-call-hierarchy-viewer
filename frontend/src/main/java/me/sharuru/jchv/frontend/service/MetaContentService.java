@@ -33,7 +33,7 @@ public class MetaContentService {
         BusinessApiResponse response = new BusinessApiResponse();
 
         List<TblMetaContent> metaLayer = metaContentRepository.findCalleeByMethodQualifiedName(methodQualifiedName);
-        if (metaLayer.isEmpty() || !"BASE".equals(metaLayer.get(0).getMethodType())) {
+        if (metaLayer.isEmpty() || (!"BASE".equals(metaLayer.get(0).getMethodType()) && !"ITFS".equals(metaLayer.get(0).getMethodType()))) {
             throw new RuntimeException("Meta node is not found: " + methodQualifiedName);
         } else {
             TblMetaContent metaBase = metaLayer.get(0);
@@ -109,7 +109,7 @@ public class MetaContentService {
 
         List<TblMetaContent> metaLayer = metaContentRepository.findCalleeByMethodQualifiedName(methodCalleeQualifiedName);
 
-        if (metaLayer.isEmpty() || !"BASE".equals(metaLayer.get(0).getMethodType())) {
+        if (metaLayer.isEmpty() || (!"BASE".equals(metaLayer.get(0).getMethodType()) && !"ITFS".equals(metaLayer.get(0).getMethodType()))) {
             throw new RuntimeException("Meta node is not found: " + methodCalleeQualifiedName);
         } else {
             TblMetaContent metaBase = metaLayer.get(0);
@@ -185,7 +185,7 @@ public class MetaContentService {
 
                 // TODO import callee comment to DB in next version of data importer
                 List<TblMetaContent> currentNodeInfo = metaContentRepository.findCalleeByMethodQualifiedName(node.getMethodCalleeQualifiedName());
-                if (!currentNodeInfo.isEmpty() && "BASE".equals(currentNodeInfo.get(0).getMethodType())) {
+                if (!currentNodeInfo.isEmpty() && ("BASE".equals(currentNodeInfo.get(0).getMethodType()) || "ITFS".equals(currentNodeInfo.get(0).getMethodType()))) {
                     currentNode.setMethodPath(currentNodeInfo.get(0).getMethodPath().substring(currentNodeInfo.get(0).getMethodPath().lastIndexOf('/') + 1));
                     currentNode.setMethodComment(currentNodeInfo.get(0).getMethodComment());
                 } else {
