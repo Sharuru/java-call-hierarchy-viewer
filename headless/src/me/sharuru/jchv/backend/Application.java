@@ -5,6 +5,8 @@ import java.io.Reader;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -42,13 +44,22 @@ import org.eclipse.jdt.internal.corext.javadoc.JavaDocCommentReader;
 @SuppressWarnings("restriction")
 public class Application implements IApplication {
 
+	private static final String VERSION = "0.5.0-SNAPSHOT";
     private List<String> tgtExtNames = Arrays.asList(".java");
     private List<String> tgtProjPrefixs = Arrays.asList("xx");
     private List<String> tgtIgnExtNames = Arrays.asList("model.java", "criteria.java", "dto.java", "result.java", "post.java");
+    private String tgtJdbcUrl = "";
+    private String tgtDbUsername = "";
+    private String tgtDbPassword = "";
+    private String tgtTableName = "";
     
 	@Override
 	public Object start(IApplicationContext context) throws Exception {
+		
+		LocalDateTime startTime = LocalDateTime.now();
+		System.out.println("JCHV launched at: " + startTime);
         System.out.println("JCHV headless backend is initializing...");
+        System.out.println("JCHV version is: " + VERSION);
 
         String[] appArgs = Platform.getApplicationArgs();
         for (int i = 0; i < appArgs.length; i++) {
@@ -59,16 +70,23 @@ public class Application implements IApplication {
                 tgtProjPrefixs = Arrays.asList(currArg.split("=")[1].split(","));
             } else if (currArg.startsWith("-jchv.tgtIgnNames")) {
                 tgtIgnExtNames = Arrays.asList(currArg.split("=")[1].split(","));
-            }
+			} else if (currArg.startsWith("-jchv.tgtJdbcUrl")) {
+				tgtJdbcUrl = currArg.split("=")[1];
+			} else if (currArg.startsWith("-jchv.tgtDbUsername")) {
+				tgtDbUsername = currArg.split("=")[1];
+			} else if (currArg.startsWith("-jchv.tgtDbPassword")) {
+				tgtDbPassword = currArg.split("=")[1];
+			} else if (currArg.startsWith("-jchv.tgtTableName")) {
+				tgtTableName = currArg.split("=")[1];
+			}
         }
 
-        System.out.println("JCHV headless backend will using following settings:");
-        System.out.println(
-                "Target extend names: " + tgtExtNames.stream().collect((Collectors.joining(", "))));
-        System.out.println("Target project prefixs: "
-                + tgtProjPrefixs.stream().collect((Collectors.joining(", "))));
-        System.out.println("Target ignored extend names: "
-                + tgtIgnExtNames.stream().collect((Collectors.joining(", "))));
+		System.out.println("JCHV headless backend will using following settings:");
+		System.out.println("Target extend names: " + tgtExtNames.stream().collect((Collectors.joining(", "))));
+		System.out.println("Target project prefixs: " + tgtProjPrefixs.stream().collect((Collectors.joining(", "))));
+		System.out.println("Target ignored extend names: " + tgtIgnExtNames.stream().collect((Collectors.joining(", "))));
+		System.out.println("Target jdbc url: " + tgtJdbcUrl);
+		System.out.println("Target table name: " + tgtTableName);
 
         System.out.println("JCHV headless backend is starting...");
 		
@@ -88,6 +106,11 @@ public class Application implements IApplication {
                 getProjectInfo(project);
             }
         }
+        
+        LocalDateTime endTime = LocalDateTime.now();
+        System.out.println("JCHV exited at: " + endTime);
+        System.out.println("JCHV job cost: " + Duration.between(startTime, endTime).toMillis() + "ms.");
+        
 		return IApplication.EXIT_OK;
 	}
 	
@@ -133,18 +156,25 @@ public class Application implements IApplication {
     }
     
     private void getIMethodDetails(IType type) throws JavaModelException {
+    	boolean isInterface = type.isInterface();
         IMethod[] methods = type.getMethods();
         for (IMethod method : methods) {
-            CallHierarchy callHierarchy = CallHierarchy.getDefault();
-            IMember[] members = {method};
-            MethodWrapper[] methodWrappers = callHierarchy.getCalleeRoots(members);
+        	System.out.println("Method:" + getMethodFullName(method));
+        	CallHierarchy callHierarchy = CallHierarchy.getDefault();
             HashSet<IMethod> callees = new LinkedHashSet<>();
-            for (MethodWrapper currentMw : methodWrappers) {
-                MethodWrapper[] mw2 = currentMw.getCalls(new NullProgressMonitor());
-                HashSet<IMethod> calleeMethods = getIMethods(mw2);
-                callees.addAll(calleeMethods);
+            if(isInterface) {
+            	callHierarchy.setSearchUsingImplementorsEnabled(true);
+				callHierarchy.getImplementingMethods(method).forEach(elem -> callees.add((IMethod) elem));
+            }else {
+            	IMember[] members = {method};
+            	callHierarchy.setSearchUsingImplementorsEnabled(false);
+                MethodWrapper[] methodWrappers = callHierarchy.getCalleeRoots(members);
+                for (MethodWrapper currentMw : methodWrappers) {
+                    MethodWrapper[] mw2 = currentMw.getCalls(new NullProgressMonitor());
+                    HashSet<IMethod> calleeMethods = getIMethods(mw2);
+                    callees.addAll(calleeMethods);
+                }	
             }
-
             //
             String newParamStr = "";
             String comma = "";
@@ -161,10 +191,9 @@ public class Application implements IApplication {
             } catch (JavaModelException e) {
                 System.out.println(e.getMessage());
             }
-            //
 
             System.out.println("Method: " + method.getPath() + "#" + method.getElementName() + "("
-                    + newParamStr + ")" + " is calling following methods:");
+                    + newParamStr + ")" + (isInterface ? " is the interface of following methods:" : " is calling following methods:"));
             String methodPath =
                     method.getPath() + "#" + method.getElementName() + "(" + newParamStr + ")";
             String methodType = "";
@@ -185,30 +214,33 @@ public class Application implements IApplication {
                     e.printStackTrace();
                 }
             }
-            String url = "";
-            String user = "";
-            String password = "";
-            String tableName = "";
-            Connection conn = null;
+            
+			Connection conn = null;
+			try {
+				conn = DriverManager.getConnection(tgtJdbcUrl, tgtDbUsername, tgtDbPassword);
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+
+            String methodQualifiedName = getMethodFullName(method);
+            methodPath = methodPath.substring(1);
+            
+			String baseMethodQualifiedName = methodQualifiedName.substring(0, methodQualifiedName.lastIndexOf('(') + 1);
+
+			String baseMethodCalleeClass = baseMethodQualifiedName.substring(0, baseMethodQualifiedName.lastIndexOf('.'));
+			baseMethodCalleeClass = baseMethodCalleeClass.substring(baseMethodCalleeClass.lastIndexOf('.') + 1);
+			String baseMethodCalleeMethod = baseMethodQualifiedName.substring(baseMethodQualifiedName.lastIndexOf('.') + 1, baseMethodQualifiedName.lastIndexOf('('));
+			
+            String baseSql = "INSERT INTO " + tgtTableName
+                    + "(method_qualified_name, method_path, method_comment, method_type, method_callee_qualified_name, method_callee_seq, method_callee_class, method_callee_method) VALUES (";
+            baseSql += "'" + methodQualifiedName + "','" + methodPath + "','" + methodComment
+                    + "','" + (isInterface ? "ITFS" : "BASE") + "','" + methodQualifiedName + "','" + "0" + "','" + baseMethodCalleeClass + "','" + baseMethodCalleeMethod + "')";
             try {
-                conn = DriverManager.getConnection(url, user, password);
+                conn.prepareStatement(baseSql).executeUpdate();
             } catch (SQLException e) {
                 e.printStackTrace();
+                System.out.println(e.getMessage());
             }
-
-            String methodqualifiedName = getMethodFullName(method);
-            methodPath = methodPath.substring(1);
-            String BASESQL = "INSERT INTO " + tableName
-                    + "(method_qualified_name, method_path, method_comment, method_type, method_callee_qualified_name, method_callee_seq) VALUES (";
-            BASESQL += "'" + methodqualifiedName + "','" + methodPath + "','" + methodComment
-                    + "','" + "BASE" + "','" + methodqualifiedName + "','" + "0" + "')";
-//            try {
-//                conn.prepareStatement(BASESQL).executeUpdate();
-//            } catch (SQLException e) {
-//                e.printStackTrace();
-//                System.out.println(e.getMessage());
-//            }
-            System.out.println(BASESQL);
             int methodCalleeSeq = 1;
             for (IMethod callee : callees) {
 
@@ -249,7 +281,11 @@ public class Application implements IApplication {
                         if (!str.endsWith(".jar") && !str.endsWith(".class")) {
                             str = str.replaceAll("\\.", "/");
                         }
-                        binPath = str + "/" + binPath;
+                        StringBuilder stringBuilder = new StringBuilder();
+						stringBuilder.append(str);
+						stringBuilder.append("/");
+						stringBuilder.append(binPath);
+						binPath = stringBuilder.toString();
                         if (str.endsWith(".jar")) {
                             break;
                         }
@@ -288,29 +324,39 @@ public class Application implements IApplication {
                         }
                     }
                 }
-                String methodCalleequalifiedName = getMethodFullName(callee);
-                String SQL = "";
-                SQL = "INSERT INTO" + tableName
-                        + "(method_qualified_name, method_path, method_comment, method_type, method_callee_qualified_name, method_callee_seq) VALUES (";
-                SQL += "'" + methodqualifiedName + "','" + methodCallee + "','"
+                String methodCalleeQualifiedName = getMethodFullName(callee);
+                
+                
+    			String subMethodCalleeQualifiedName = methodCalleeQualifiedName.substring(0, methodCalleeQualifiedName.lastIndexOf('(') + 1);
+    			
+    			String subMethodCalleeClass = subMethodCalleeQualifiedName.substring(0, subMethodCalleeQualifiedName.lastIndexOf('.'));
+    			subMethodCalleeClass = subMethodCalleeClass.substring(subMethodCalleeClass.lastIndexOf('.') + 1);
+    			String subMethodCalleeMethod = subMethodCalleeQualifiedName.substring(subMethodCalleeQualifiedName.lastIndexOf('.') + 1, subMethodCalleeQualifiedName.lastIndexOf('('));
+
+                
+    			System.out.println(" -> " + (isInterface ? "Impl: " : "") + methodCalleeQualifiedName);
+                
+                String subSql = "";
+                subSql = "INSERT INTO " + 	tgtTableName
+                        + "(method_qualified_name, method_path, method_comment, method_type, method_callee_qualified_name, method_callee_seq, method_callee_class, method_callee_method) VALUES (";
+                subSql += "'" + methodQualifiedName + "','" + methodCallee + "','"
                         + methodCalleeComment + "','" + methodType + "','"
-                        + methodCalleequalifiedName + "','" + methodCalleeSeq + "')";
-//                try {
-//                    conn.prepareStatement(SQL).executeUpdate();
-//                } catch (SQLException e) {
-//                    e.printStackTrace();
-//                    System.out.println(e.getMessage());
-//                }
-                System.out.println(SQL);
+                        + methodCalleeQualifiedName + "','" + methodCalleeSeq + "','" + subMethodCalleeClass + "','" + subMethodCalleeMethod + "')";
+                try {
+                    conn.prepareStatement(subSql).executeUpdate();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                    System.out.println(e.getMessage());
+                }
                 methodCalleeSeq++;
             }
 
-//            try {
-//                conn.close();
-//            } catch (SQLException e) {
-//                System.out.println(e.getMessage());
-//                e.printStackTrace();
-//            }
+            try {
+                conn.close();
+            } catch (SQLException e) {
+                System.out.println(e.getMessage());
+                e.printStackTrace();
+            }
         }
     }
 
@@ -326,7 +372,7 @@ public class Application implements IApplication {
 
 
     HashSet<IMethod> getIMethods(MethodWrapper[] methodWrappers) {
-        HashSet<IMethod> c = new LinkedHashSet<IMethod>();
+        HashSet<IMethod> c = new LinkedHashSet<>();
         for (MethodWrapper m : methodWrappers) {
             IMethod im = getIMethodFromMethodWrapper(m);
             if (im != null) {

@@ -10,3 +10,5 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.jface.text;bundle-version="3.16.100"
 Automatic-Module-Name: headless-ast
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Bundle-ClassPath: libs/postgresql-42.2.9.jar,
+ .
