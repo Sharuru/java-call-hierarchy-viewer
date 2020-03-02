@@ -44,7 +44,7 @@ import org.eclipse.jdt.internal.corext.javadoc.JavaDocCommentReader;
 @SuppressWarnings("restriction")
 public class Application implements IApplication {
 
-	private static final String VERSION = "0.5.0-SNAPSHOT";
+	private static final String VERSION = "0.5.5.SNAPSHOT";
     private List<String> tgtExtNames = Arrays.asList(".java");
     private List<String> tgtProjPrefixs = Arrays.asList("xx");
     private List<String> tgtIgnExtNames = Arrays.asList("model.java", "criteria.java", "dto.java", "result.java", "post.java");
