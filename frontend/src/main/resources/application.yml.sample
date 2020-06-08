@@ -10,9 +10,14 @@ spring:
         jdbc:
           lob:
             non_contextual_creation: true
+    hibernate:
+      naming:
+        physical-strategy: me.sharuru.jchv.frontend.config.TableNameStrategy
 
 server:
   port: 8282
+
+#jchv.table-prefix: AS_REQUIRED
 
 logging:
   pattern:

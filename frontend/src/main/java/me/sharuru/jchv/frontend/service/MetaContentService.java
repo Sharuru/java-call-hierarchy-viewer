@@ -1,21 +1,15 @@
 package me.sharuru.jchv.frontend.service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-
+import lombok.extern.slf4j.Slf4j;
+import me.sharuru.jchv.frontend.entity.TblMetaData;
+import me.sharuru.jchv.frontend.model.BusinessApiResponse;
+import me.sharuru.jchv.frontend.model.TreeGraphNode;
+import me.sharuru.jchv.frontend.repository.MetaDataRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import lombok.extern.slf4j.Slf4j;
-import me.sharuru.jchv.frontend.entity.TblMetaContent;
-import me.sharuru.jchv.frontend.model.BusinessApiResponse;
-import me.sharuru.jchv.frontend.model.TreeGraphNode;
-import me.sharuru.jchv.frontend.repository.MetaContentRepository;
+import java.util.*;
 
 /**
  * Business service
@@ -26,7 +20,7 @@ import me.sharuru.jchv.frontend.repository.MetaContentRepository;
 public class MetaContentService {
 
     @Autowired
-    MetaContentRepository metaContentRepository;
+    MetaDataRepository metaDataRepository;
 
     /**
      * Get callee method information
@@ -38,11 +32,11 @@ public class MetaContentService {
 
         BusinessApiResponse response = new BusinessApiResponse();
 
-        List<TblMetaContent> metaLayer = metaContentRepository.findCalleeByMethodQualifiedName(methodQualifiedName);
+        List<TblMetaData> metaLayer = metaDataRepository.findCalleeByMethodQualifiedName(methodQualifiedName);
         if (metaLayer.isEmpty() || (!"BASE".equals(metaLayer.get(0).getMethodType()) && !"ITFS".equals(metaLayer.get(0).getMethodType()))) {
             throw new RuntimeException("Meta node is not found: " + methodQualifiedName);
         } else {
-            TblMetaContent metaBase = metaLayer.get(0);
+            TblMetaData metaBase = metaLayer.get(0);
             response.getTreeGraphData().setId(metaBase.getId());
             response.getTreeGraphData().setMethodQualifiedName(metaBase.getMethodCalleeQualifiedName());
             response.getTreeGraphData().setMethodPath(metaBase.getMethodPath());
@@ -71,12 +65,12 @@ public class MetaContentService {
      * @param parentLayer travel criteria layer, usually the base
      * @return graph model
      */
-    private LinkedList<TreeGraphNode> visitCalleeMethod(List<TblMetaContent> parentLayer,
+    private LinkedList<TreeGraphNode> visitCalleeMethod(List<TblMetaData> parentLayer,
             Map<String, Integer> idxMap, LinkedList<String> methodPathList) {
 
         LinkedList<TreeGraphNode> nodeGraphList = new LinkedList<>();
 
-        for (TblMetaContent node : parentLayer) {
+        for (TblMetaData node : parentLayer) {
             if (("SRC".equals(node.getMethodType()) || "LOOP-SRC".equals(node.getMethodType()))
                     && !node.getMethodPath().contains("Model.java#")
                     && !node.getMethodPath().contains("Base.java#")
@@ -89,7 +83,7 @@ public class MetaContentService {
                 currentNode.setMethodType(node.getMethodType());
 
                 // TODO import callee comment to DB in next version of data importer
-                List<TblMetaContent> currentNodeInfo = metaContentRepository.findCalleeByMethodQualifiedName(node.getMethodCalleeQualifiedName());
+                List<TblMetaData> currentNodeInfo = metaDataRepository.findCalleeByMethodQualifiedName(node.getMethodCalleeQualifiedName());
                 if (!currentNodeInfo.isEmpty() && "BASE".equals(currentNodeInfo.get(0).getMethodType())) {
                     currentNode.setMethodComment(currentNodeInfo.get(0).getMethodComment());
                 } else {
@@ -107,7 +101,7 @@ public class MetaContentService {
                             .concat(currentNode.getMethodComment()));
                     if (!"LOOP-SRC".equals(node.getMethodType())) {
                         currentNode.setChildren(visitCalleeMethod(
-                                metaContentRepository.findCalleeByMethodQualifiedName(
+                                metaDataRepository.findCalleeByMethodQualifiedName(
                                         node.getMethodCalleeQualifiedName()),
                                 idxMap, methodPathList));
                     }
@@ -128,12 +122,12 @@ public class MetaContentService {
     public BusinessApiResponse getCallerMethodInfo(String methodCalleeQualifiedName) {
         BusinessApiResponse response = new BusinessApiResponse();
 
-        List<TblMetaContent> metaLayer = metaContentRepository.findCalleeByMethodQualifiedName(methodCalleeQualifiedName);
+        List<TblMetaData> metaLayer = metaDataRepository.findCalleeByMethodQualifiedName(methodCalleeQualifiedName);
 
         if (metaLayer.isEmpty() || (!"BASE".equals(metaLayer.get(0).getMethodType()) && !"ITFS".equals(metaLayer.get(0).getMethodType()))) {
             throw new RuntimeException("Meta node is not found: " + methodCalleeQualifiedName);
         } else {
-            TblMetaContent metaBase = metaLayer.get(0);
+            TblMetaData metaBase = metaLayer.get(0);
             response.getTreeGraphData().setId(metaBase.getId());
             response.getTreeGraphData().setMethodQualifiedName(metaBase.getMethodCalleeQualifiedName());
             response.getTreeGraphData().setMethodPath(metaBase.getMethodPath());
@@ -150,7 +144,7 @@ public class MetaContentService {
 
             response.getTreeGraphData()
                     .setChildren(visitCallerMethod(
-                            metaContentRepository.findCallerByMethodCalleeQualifiedName(
+                            metaDataRepository.findCallerByMethodCalleeQualifiedName(
                                     methodCalleeQualifiedName),
                             callerMethodIndexMap, methodPathList));
             response.setMethodIndexMap(callerMethodIndexMap);
@@ -170,12 +164,11 @@ public class MetaContentService {
     public BusinessApiResponse getQualifiedNames(String methodSimpleClass, String methodSimpleMethod) {
         BusinessApiResponse response = new BusinessApiResponse();
 
-
         if (StringUtils.isEmpty(methodSimpleClass) && StringUtils.isEmpty(methodSimpleMethod)) {
             throw new RuntimeException("Transferred value is not acceptable.");
         }
 
-        List<TblMetaContent> queryResult = metaContentRepository.findQualifiedBySimpleName(methodSimpleClass, methodSimpleMethod);
+        List<TblMetaData> queryResult = metaDataRepository.findQualifiedBySimpleName(methodSimpleClass, methodSimpleMethod);
 
         if (queryResult.isEmpty()) {
             throw new RuntimeException("Matched qualified name is not found: " + methodSimpleClass + ", " + methodSimpleMethod);
@@ -205,9 +198,9 @@ public class MetaContentService {
      * @param parentLayer travel criteria layer, usually the base
      * @return graph model
      */
-    private LinkedList<TreeGraphNode> visitCallerMethod(List<TblMetaContent> parentLayer, Map<String, Integer> idxMap, LinkedList<String> methodPathList) {
+    private LinkedList<TreeGraphNode> visitCallerMethod(List<TblMetaData> parentLayer, Map<String, Integer> idxMap, LinkedList<String> methodPathList) {
         LinkedList<TreeGraphNode> nodeGraphList = new LinkedList<>();
-        for (TblMetaContent node : parentLayer) {
+        for (TblMetaData node : parentLayer) {
             if ("SRC".equals(node.getMethodType())) {
                 TreeGraphNode currentNode = new TreeGraphNode();
                 currentNode.setId(node.getId());
@@ -215,7 +208,7 @@ public class MetaContentService {
                 currentNode.setMethodType(node.getMethodType());
 
                 // TODO import callee comment to DB in next version of data importer
-                List<TblMetaContent> currentNodeInfo = metaContentRepository.findCalleeByMethodQualifiedName(node.getMethodCalleeQualifiedName());
+                List<TblMetaData> currentNodeInfo = metaDataRepository.findCalleeByMethodQualifiedName(node.getMethodCalleeQualifiedName());
                 if (!currentNodeInfo.isEmpty() && ("BASE".equals(currentNodeInfo.get(0).getMethodType()) || "ITFS".equals(currentNodeInfo.get(0).getMethodType()))) {
                     currentNode.setMethodPath(currentNodeInfo.get(0).getMethodPath().substring(currentNodeInfo.get(0).getMethodPath().lastIndexOf('/') + 1));
                     currentNode.setMethodComment(currentNodeInfo.get(0).getMethodComment());
@@ -233,7 +226,7 @@ public class MetaContentService {
                     methodPathList.add(currentNode.getId().toString().concat("|@|")
                             .concat(currentNode.getUiMethodPath()).concat("|@|")
                             .concat(currentNode.getMethodComment()));
-                    currentNode.setChildren(visitCallerMethod(metaContentRepository.findCallerByMethodCalleeQualifiedName(node.getMethodQualifiedName()), idxMap, methodPathList));
+                    currentNode.setChildren(visitCallerMethod(metaDataRepository.findCallerByMethodCalleeQualifiedName(node.getMethodQualifiedName()), idxMap, methodPathList));
                     nodeGraphList.add(currentNode);
                 }
             }

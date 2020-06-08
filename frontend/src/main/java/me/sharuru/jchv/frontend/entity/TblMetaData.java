@@ -9,23 +9,19 @@ import javax.persistence.*;
  * Business working table
  * <p>
  * Index on name columns are recommended for performance tuning.
- * <p>
- * This is v3 version and v4 is under reviewing.
- * v5 is also on the way :)
- * 2019/12/01
  */
 @Data
 @Entity
-@Table(name = "meta_table")
+@Table(name = "meta_data")
 @NoArgsConstructor
-public class TblMetaContent {
+public class TblMetaData {
 
     /**
      * Primary key
      */
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq")
-    @SequenceGenerator(name = "seq", sequenceName = "meta_table_id_seq")
+    @SequenceGenerator(name = "seq")
     private Long id;
 
     /**
