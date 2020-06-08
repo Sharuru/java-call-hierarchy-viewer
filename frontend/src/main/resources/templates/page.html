@@ -19,8 +19,8 @@
     </div>
     <div id="top-right-info"
          style="position: absolute; top:0.4rem; right: 0.4rem; font-size: 1px; color: gray; text-align: right;">
-        Tech Beta 20200210152520<br/>
-        Table Epsilon<br/>
+        <span th:text="${appVersion}"></span>&nbsp;<span th:text="${appBuildTime}"></span> <br/>
+        Table <span th:text="${appTableName}"></span><br/>
     </div>
     <div id="bottom-left-info"
          style="position: absolute; bottom:0.4rem; left: 0.4rem; font-size: 1px; color: gray; text-align: right;">

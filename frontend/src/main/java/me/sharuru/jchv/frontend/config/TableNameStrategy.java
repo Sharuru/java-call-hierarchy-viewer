@@ -23,11 +23,18 @@ public class TableNameStrategy extends SpringPhysicalNamingStrategy implements S
     @Value("${jchv.table-prefix:}")
     private String tableNamePrefix;
 
+    private String tableName = "";
+
     @Override
     public Identifier toPhysicalTableName(Identifier name, JdbcEnvironment context) {
         log.info("Current table name prefix is: {}.", tableNamePrefix);
         String tableName = StringUtils.isEmpty(tableNamePrefix) ? name.getText() : tableNamePrefix.concat("_").concat(name.getText());
+        this.tableName = tableName;
         return new Identifier(tableName, name.isQuoted());
+    }
+
+    public String getTableName(){
+        return this.tableName;
     }
 
 }
