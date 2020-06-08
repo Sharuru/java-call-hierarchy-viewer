@@ -49,6 +49,35 @@ div#info-button-layer {
     background: #F1F1F1;
 }
 
+div#search-area {
+    display: flex;
+    flex-direction: column;
+    width: 34rem;
+    height: 145px;
+    padding-bottom: 2.2rem;
+    font-size: 14px;
+    border: 2px solid gray;
+    position: absolute;
+    top: 14.5rem;
+    left: 5rem;
+    z-index: 10;
+    background: rgba(255, 255, 255, 0.9);
+}
+
+div#search-content {
+    flex: 1;
+    overflow-y: auto;
+    word-break: break-all;
+}
+
+div#search-button-layer {
+    position: absolute;
+    width: 100%;
+    bottom: 0;
+    padding: 0.2rem;
+    background: #F1F1F1;
+}
+
 .minimap {
     border: 2px solid gray;
     position: absolute;

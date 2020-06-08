@@ -1,15 +1,21 @@
 package me.sharuru.jchv.frontend.service;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
+
 import lombok.extern.slf4j.Slf4j;
 import me.sharuru.jchv.frontend.entity.TblMetaContent;
 import me.sharuru.jchv.frontend.model.BusinessApiResponse;
 import me.sharuru.jchv.frontend.model.TreeGraphNode;
 import me.sharuru.jchv.frontend.repository.MetaContentRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
-
-import java.util.*;
 
 /**
  * Business service
@@ -45,9 +51,16 @@ public class MetaContentService {
 
             Map<String, Integer> methodIndexMap = new HashMap<>();
             methodIndexMap.put(metaBase.getMethodCalleeQualifiedName(), 1);
+            LinkedList<String> methodPathList = new LinkedList<>();
+            response.getTreeGraphData().getUiMethodContext();
+            methodPathList.add(metaBase.getId().toString().concat("|@|")
+                    .concat(response.getTreeGraphData().getUiMethodPath()).concat("|@|")
+                    .concat(metaBase.getMethodComment()));
 
-            response.getTreeGraphData().setChildren(visitCalleeMethod(metaLayer, methodIndexMap));
+            response.getTreeGraphData()
+                    .setChildren(visitCalleeMethod(metaLayer, methodIndexMap, methodPathList));
             response.setMethodIndexMap(methodIndexMap);
+            response.setMethodPathList(methodPathList);
             return response;
         }
     }
@@ -58,7 +71,8 @@ public class MetaContentService {
      * @param parentLayer travel criteria layer, usually the base
      * @return graph model
      */
-    private LinkedList<TreeGraphNode> visitCalleeMethod(List<TblMetaContent> parentLayer, Map<String, Integer> idxMap) {
+    private LinkedList<TreeGraphNode> visitCalleeMethod(List<TblMetaContent> parentLayer,
+            Map<String, Integer> idxMap, LinkedList<String> methodPathList) {
 
         LinkedList<TreeGraphNode> nodeGraphList = new LinkedList<>();
 
@@ -87,8 +101,15 @@ public class MetaContentService {
                     log.info("{} is already existed in the callee chain, skipped.", node.getMethodCalleeQualifiedName());
                 } else {
                     idxMap.put(node.getMethodCalleeQualifiedName(), 1);
+                    currentNode.getUiMethodContext();
+                    methodPathList.add(currentNode.getId().toString().concat("|@|")
+                            .concat(currentNode.getUiMethodPath()).concat("|@|")
+                            .concat(currentNode.getMethodComment()));
                     if (!"LOOP-SRC".equals(node.getMethodType())) {
-                        currentNode.setChildren(visitCalleeMethod(metaContentRepository.findCalleeByMethodQualifiedName(node.getMethodCalleeQualifiedName()), idxMap));
+                        currentNode.setChildren(visitCalleeMethod(
+                                metaContentRepository.findCalleeByMethodQualifiedName(
+                                        node.getMethodCalleeQualifiedName()),
+                                idxMap, methodPathList));
                     }
                     nodeGraphList.add(currentNode);
                 }
@@ -121,9 +142,19 @@ public class MetaContentService {
 
             Map<String, Integer> callerMethodIndexMap = new HashMap<>();
             callerMethodIndexMap.put(metaBase.getMethodCalleeQualifiedName(), 1);
+            LinkedList<String> methodPathList = new LinkedList<>();
+            response.getTreeGraphData().getUiMethodContext();
+            methodPathList.add(metaBase.getId().toString().concat("|@|")
+                    .concat(response.getTreeGraphData().getUiMethodPath()).concat("|@|")
+                    .concat(metaBase.getMethodComment()));
 
-            response.getTreeGraphData().setChildren(visitCallerMethod(metaContentRepository.findCallerByMethodCalleeQualifiedName(methodCalleeQualifiedName), callerMethodIndexMap));
+            response.getTreeGraphData()
+                    .setChildren(visitCallerMethod(
+                            metaContentRepository.findCallerByMethodCalleeQualifiedName(
+                                    methodCalleeQualifiedName),
+                            callerMethodIndexMap, methodPathList));
             response.setMethodIndexMap(callerMethodIndexMap);
+            response.setMethodPathList(methodPathList);
 
             return response;
         }
@@ -174,7 +205,7 @@ public class MetaContentService {
      * @param parentLayer travel criteria layer, usually the base
      * @return graph model
      */
-    private LinkedList<TreeGraphNode> visitCallerMethod(List<TblMetaContent> parentLayer, Map<String, Integer> idxMap) {
+    private LinkedList<TreeGraphNode> visitCallerMethod(List<TblMetaContent> parentLayer, Map<String, Integer> idxMap, LinkedList<String> methodPathList) {
         LinkedList<TreeGraphNode> nodeGraphList = new LinkedList<>();
         for (TblMetaContent node : parentLayer) {
             if ("SRC".equals(node.getMethodType())) {
@@ -198,7 +229,11 @@ public class MetaContentService {
                     log.info("{} is already existed in caller chain, skipped.", node.getMethodQualifiedName());
                 } else {
                     idxMap.put(node.getMethodQualifiedName(), 1);
-                    currentNode.setChildren(visitCallerMethod(metaContentRepository.findCallerByMethodCalleeQualifiedName(node.getMethodQualifiedName()), idxMap));
+                    currentNode.getUiMethodContext();
+                    methodPathList.add(currentNode.getId().toString().concat("|@|")
+                            .concat(currentNode.getUiMethodPath()).concat("|@|")
+                            .concat(currentNode.getMethodComment()));
+                    currentNode.setChildren(visitCallerMethod(metaContentRepository.findCallerByMethodCalleeQualifiedName(node.getMethodQualifiedName()), idxMap, methodPathList));
                     nodeGraphList.add(currentNode);
                 }
             }

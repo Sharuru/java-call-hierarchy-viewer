@@ -1,11 +1,12 @@
 package me.sharuru.jchv.frontend.model;
 
-import lombok.Data;
-import lombok.ToString;
-
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
+
+import lombok.Data;
+import lombok.ToString;
 
 /**
  * API response model from backend
@@ -28,6 +29,11 @@ public class BusinessApiResponse implements Serializable {
      * Method complexity index map
      */
     private Map<String, Integer> methodIndexMap = new HashMap<>();
+
+    /**
+     * Method Path map
+     */
+    private LinkedList<String> methodPathList = new LinkedList<>();
 
     /**
      * Tree graph data

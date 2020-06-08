@@ -58,6 +58,7 @@
                         </ul>
                     </div>
                     <div class="col" style="text-align: right;">
+                        <button id="node-search-div-button" type="button" class="btn btn-outline-primary" data-toggle="button">Method Search</button>
                         <button id="name-helper-button" type="button" class="btn btn-outline-primary" data-toggle="modal" data-target="#name-helper-modal">Name helper</button>
                         <button id="reset-layout-button" type="button" class="btn btn-outline-primary">Reset layout</button>
                         <button id="collection-button" type="button" class="btn btn-outline-primary" disabled>Collection</button>
@@ -90,6 +91,34 @@
                 </div>
                 <div class="tab-pane fade" id="pills-callee" role="tabpanel">
                     <div id="callee-graph-container"></div>
+                </div>
+                <div id="search-area" style="left:600px;top:240px; display: none;">
+                    <div id="search-area-title"
+                         style="position: absolute;top: -1.2rem;background: white;left: -0.1rem;border: 2px solid gray;cursor: move;">
+                        <strong>&nbsp;&nbsp;Search&nbsp;&nbsp;</strong></div>
+                    <div id="search-content" style="padding: 0.4rem">
+                        <div>
+                            <input id='node-search-select-path' type='radio' name='node-search-select' checked="checked" /><label for="node-search-select-path">&nbsp;Path</label>&nbsp;&nbsp;
+                            <input id='node-search-select-comment' type='radio' name='node-search-select' /><label for="node-search-select-comment">&nbsp;Comment</label>
+                        </div>
+                        <div id='node-search-title-path'><strong>Method path: </strong><span id="search-qualified-name"></span>
+                        </div>
+                        <div id='node-search-title-comment' style="display: none;"><strong>Method comment: </strong><span id="search-qualified-name"></span>
+                        </div>
+                        <div>
+                            <input id="method-keyword-input" type="text" class="form-control" list="node-path-datalist">
+                            <datalist id="node-path-datalist">
+                            </datalist>
+                            <datalist id="node-comment-datalist">
+                            </datalist>
+                        </div>
+                    </div>
+                    <div id="search-button-layer">
+                        <label id="node-search-result"
+                              style="left: 0.4rem; bottom: 0.4rem; position: absolute; cursor: pointer; font-weight: 700;"
+                              title="Reset panel size&position"></label>
+                        <div align="right"><button id="node-search-btn" type="button" class="btn btn-outline-primary btn-sm">Search Next</button></div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -141,11 +170,15 @@
                         <div class="input-group-prepend">
                             <span class="input-group-text" id="inputGroup-sizing-sm"><i class="fas fa-search"></i></span>
                         </div>
-                        <input id="method-keyword-input-class" type="text" class="form-control" placeholder="Enter class name here...">
+                        <input id="method-keyword-input-class" type="text" class="form-control" placeholder="Enter class name here..." list="class-datalist">
+                        <datalist id="class-datalist">
+                        </datalist>
                         <div class="input-group-prepend">
                             <span class="input-group-text" id="inputGroup-sizing-sm-hashtag">#</span>
                         </div>
-                        <input id="method-keyword-input-method" type="text" class="form-control" placeholder="Enter method name here...">
+                        <input id="method-keyword-input-method" type="text" class="form-control" placeholder="Enter method name here..." list="method-datalist">
+                        <datalist id="method-datalist">
+                        </datalist>
                         <div class="input-group-append">
                             <button id="name-search-button" type="button" class="btn btn-primary btn-lg">Find qualified name</button>
                         </div>

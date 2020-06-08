@@ -16,7 +16,7 @@ import javax.persistence.*;
  */
 @Data
 @Entity
-@Table(name = "meta_proto_epsilon")
+@Table(name = "meta_table")
 @NoArgsConstructor
 public class TblMetaContent {
 
@@ -25,7 +25,7 @@ public class TblMetaContent {
      */
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq")
-    @SequenceGenerator(name = "seq", sequenceName = "meta_proto_gamma_id_seq")
+    @SequenceGenerator(name = "seq", sequenceName = "meta_table_id_seq")
     private Long id;
 
     /**
