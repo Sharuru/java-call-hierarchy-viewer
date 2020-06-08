@@ -66,7 +66,7 @@ public class MetaContentService {
      * @return graph model
      */
     private LinkedList<TreeGraphNode> visitCalleeMethod(List<TblMetaData> parentLayer,
-            Map<String, Integer> idxMap, LinkedList<String> methodPathList) {
+                                                        Map<String, Integer> idxMap, LinkedList<String> methodPathList) {
 
         LinkedList<TreeGraphNode> nodeGraphList = new LinkedList<>();
 
@@ -157,7 +157,7 @@ public class MetaContentService {
     /**
      * Get qualified name by method simple name
      *
-     * @param methodSimpleClass method simple name
+     * @param methodSimpleClass  method simple name
      * @param methodSimpleMethod method simple name
      * @return information result
      */

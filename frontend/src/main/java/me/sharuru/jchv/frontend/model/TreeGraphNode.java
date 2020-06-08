@@ -27,7 +27,7 @@ public class TreeGraphNode implements Serializable {
     private LinkedList<TreeGraphNode> children = new LinkedList<>();
 
     public String getUiMethodContext() {
-        if(this.methodQualifiedName == null || this.methodQualifiedName.isEmpty()){
+        if (this.methodQualifiedName == null || this.methodQualifiedName.isEmpty()) {
             return "";
         }
         String rawQualifiedName = this.methodQualifiedName.substring(0, this.methodQualifiedName.lastIndexOf('('));
@@ -44,10 +44,10 @@ public class TreeGraphNode implements Serializable {
         return className + "\n" + methodName + "\n" + paramCount + " Params";
     }
 
-    public String getUiMethodCommentSummary(){
+    public String getUiMethodCommentSummary() {
         if (this.methodComment == null || this.methodComment.isEmpty()) {
             return "No comment";
-        }else{
+        } else {
             String noLbComment = this.methodComment.replaceAll("(\r\n|\n)", " ");
             return noLbComment.length() >= 20 ? noLbComment.substring(0, 16).concat("...") : noLbComment;
         }
