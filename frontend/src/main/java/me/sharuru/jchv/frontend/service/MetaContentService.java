@@ -208,7 +208,7 @@ public class MetaContentService {
                 currentNode.setMethodType(node.getMethodType());
 
                 // TODO import callee comment to DB in next version of data importer
-                List<TblMetaData> currentNodeInfo = metaDataRepository.findCalleeByMethodQualifiedName(node.getMethodCalleeQualifiedName());
+                List<TblMetaData> currentNodeInfo = metaDataRepository.findCalleeByMethodQualifiedName(node.getMethodQualifiedName());
                 if (!currentNodeInfo.isEmpty() && ("BASE".equals(currentNodeInfo.get(0).getMethodType()) || "ITFS".equals(currentNodeInfo.get(0).getMethodType()))) {
                     currentNode.setMethodPath(currentNodeInfo.get(0).getMethodPath().substring(currentNodeInfo.get(0).getMethodPath().lastIndexOf('/') + 1));
                     currentNode.setMethodComment(currentNodeInfo.get(0).getMethodComment());
