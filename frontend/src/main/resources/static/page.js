@@ -1,65 +1,86 @@
 $(document).ready(function () {
 
-    // Inspector
+    /**
+     * Inspector panel
+     * tooltip registration.
+     */
     $('#info-func-btn-1').tooltip({
         'trigger': 'hover',
         'placement': 'bottom',
         'title': 'Set qualified name as keyword'
     });
 
+    /**
+     * Inspector panel
+     * set current selected node's qualified name as next search keyword.
+     */
     $("#info-func-btn-1").on('click', function () {
         $("#keyword-input").val($('#info-qualified-name').text());
     });
 
-    $('#info-func-btn-2').tooltip({
-        'trigger': 'hover',
-        'placement': 'bottom',
-        'title': 'Copy class filename'
-    });
+    /**
+     * Inspector panel
+     * draggable registration.
+     */
+    $("#inspector-panel").draggable({cursor: "move", handle: "div#inspector-panel-title"});
 
-    $('#info-func-btn-3').tooltip({
-        'trigger': 'hover',
-        'placement': 'bottom',
-        'title': 'Copy method without parameters'
-    });
+    /**
+     * Inspector panel
+     * resizeable registration.
+     */
+    $("#inspector-panel").resizable();
 
-    $("#info-area").draggable({cursor: "move", handle: "div#info-area-title"});
-    $("#info-area").resizable();
-    $("#search-area").draggable({cursor: "move", handle: "div#search-area-title"});
 
-    var nodeSearchPathFlag = true;
-    getNameHelperHistory('nameSearchClass', 'class-datalist');
-    getNameHelperHistory('nameSearchMethod', 'method-datalist');
-    getNameHelperHistory('nameSearchNodeMethod', 'node-path-datalist');
-    getNameHelperHistory('nameSearchNodeComment', 'node-comment-datalist');
-    changeNodeSearchFlag();
-
-    $("#reset-handler").on('click', function () {
-        $("#info-area").animate({
-            left: "80px",
-            top: "240px",
+    /**
+     * Inspector panel
+     * reset panel size registration.
+     */
+    $("#inspector-panel-reset-handler").on('click', function () {
+        $("#inspector-panel").animate({
+            left: "4rem",
+            top: "14rem",
             width: "30rem",
-            height: "160px"
+            height: "10rem"
         }, 500);
     });
 
-    $("#collection-button").on('click', function () {
-        $('#collection-modal').modal('show');
-    });
-
+    /**
+     * Layout reset button
+     * reset layout event registration.
+     */
     $("#reset-layout-button").on('click', function () {
         if ($("#pills-caller-tab").hasClass('active') === true && typeof globalCallerGraph !== 'undefined' && typeof globalCallerGraph.graph !== 'undefined' ) {
-            globalCallerGraph.graph.refreshLayout(true);
+            globalCallerGraph.graph.layout(true);
         } else if($("#pills-callee-tab").hasClass('active') === true && typeof globalCalleeGraph !== 'undefined' && typeof globalCalleeGraph.graph !== 'undefined' ){
-            globalCalleeGraph.graph.refreshLayout(true);
+            globalCalleeGraph.graph.layout(true);
         }
-        $("#info-area").animate({
-            left: "80px",
-            top: "240px",
+        $("#inspector-panel").animate({
+            left: "4rem",
+            top: "14rem",
             width: "30rem",
-            height: "160px"
+            height: "10rem"
         }, 500);
     });
+
+    $("#search-area").draggable({cursor: "move", handle: "div#search-area-title"});
+
+    // var nodeSearchPathFlag = true;
+    // getNameHelperHistory('nameSearchClass', 'class-datalist');
+    // getNameHelperHistory('nameSearchMethod', 'method-datalist');
+    // getNameHelperHistory('nameSearchNodeMethod', 'node-path-datalist');
+    // getNameHelperHistory('nameSearchNodeComment', 'node-comment-datalist');
+    // changeNodeSearchFlag();
+
+
+    /**
+     * Method call collection model
+     * button click registration.
+     */
+    $("#collection-calls-button").on("click", function () {
+        $("#collection-calls-modal").modal("show");
+    });
+
+
 
     var lastNodeId = null;
     var lastKeyword = "";
@@ -139,13 +160,13 @@ $(document).ready(function () {
             nodeIds = new Array();
             nodeSearchIdx = 0;
 
-            if (nodeSearchPathFlag) {
-                setNameHelperHistory('nameSearchNodeMethod', keyword);
-                getNameHelperHistory('nameSearchNodeMethod', 'node-path-datalist');
-            } else {
-                setNameHelperHistory('nameSearchNodeComment', keyword);
-                getNameHelperHistory('nameSearchNodeComment', 'node-comment-datalist');
-            }
+            // if (nodeSearchPathFlag) {
+            //     setNameHelperHistory('nameSearchNodeMethod', keyword);
+            //     getNameHelperHistory('nameSearchNodeMethod', 'node-path-datalist');
+            // } else {
+            //     setNameHelperHistory('nameSearchNodeComment', keyword);
+            //     getNameHelperHistory('nameSearchNodeComment', 'node-comment-datalist');
+            // }
 
             if (typeof methodPathArr === "undefined"){
                 lastKeyword = "";
@@ -208,13 +229,13 @@ $(document).ready(function () {
             $("#search-area").css("display", "none");
         }
 
-        $("#collection-button").prop("disabled", "disabled");
+        $("#collection-calls-button").prop("disabled", "disabled");
         if (e.target.id === 'pills-caller-tab' && typeof globalCallerGraph !== 'undefined' && typeof globalCallerGraph.coll !== 'undefined') {
             drawCollectionModelContent(globalCallerGraph.coll);
-            $("#collection-button").removeAttr("disabled");
+            $("#collection-calls-button").removeAttr("disabled");
         } else if (e.target.id === 'pills-callee-tab' && typeof globalCalleeGraph !== 'undefined' && typeof globalCalleeGraph.coll !== 'undefined') {
             drawCollectionModelContent(globalCalleeGraph.coll);
-            $("#collection-button").removeAttr("disabled");
+            $("#collection-calls-button").removeAttr("disabled");
         }
         if (e.target.id === 'pills-caller-tab') {
             calleeBiz = false;
@@ -313,7 +334,7 @@ $(document).ready(function () {
         lastNodeId = null;
         $("#node-search-result").html("");
 
-        $("#collection-button").prop("disabled", "disabled");
+        $("#collection-calls-button").prop("disabled", "disabled");
         $("#search-button").prop("disabled", "disabled");
         $("#search-button").html('<span class="spinner-border spinner-border-sm" role="status"></span>Searching...');
 
@@ -344,10 +365,8 @@ $(document).ready(function () {
                         globalCallerGraph.graph.destroy();
                         globalCallerGraph = {};
                     }
-                    const minimap = new Minimap({
-                        size: [160, 160],
-                        className: 'minimap',
-                        type: 'delegate'
+                    const minimap = new G6.Minimap({
+                        size: [160, 160]
                     });
 
                     let containerId = calleeBiz ? 'callee-graph-container' : 'caller-graph-container';
@@ -357,11 +376,11 @@ $(document).ready(function () {
                         width: document.getElementById(containerId).scrollWidth,
                         height: document.getElementById(containerId).scrollHeight || window.innerHeight * 0.7,
                         defaultNode: {
-                            shape: 'method-card',
+                            type: 'method-card',
                             anchorPoints: [[0, 0.5], [1, 0.5]]
                         },
                         defaultEdge: {
-                            shape: 'cubic-horizontal'
+                            type: 'cubic-horizontal'
                         },
                         modes: {
                             default: [{
@@ -391,6 +410,7 @@ $(document).ready(function () {
                             }
                         },
                         plugins: [minimap]
+
                     });
 
                     drawingGraph.data(data.treeGraphData);
@@ -406,7 +426,7 @@ $(document).ready(function () {
                         }
                     });
 
-                    drawingGraph.refreshLayout(true);
+                    drawingGraph.layout(true);
 
                     var methodPathArr = new Array();
                     for (let i in data.methodPathList) {
@@ -418,8 +438,6 @@ $(document).ready(function () {
                         methodPathArr.push(methodPathObj);
                     }
 
-                    addMinimapTitle(calleeBiz, drawingGraph, minimap);
-
                     if (calleeBiz) {
                         globalCalleeGraph.graph = drawingGraph;
                         globalCalleeGraph.coll = data.methodIndexMap;
@@ -430,9 +448,9 @@ $(document).ready(function () {
                         globalCallerGraph.methodPathArr = methodPathArr;
                     }
 
-                    let workingCollDat = calleeBiz ? globalCalleeGraph.coll : globalCallerGraph.coll;
-                    drawCollectionModelContent(workingCollDat);
-                    $("#collection-button").removeAttr("disabled");
+                    let currentWorkingCollectionData = calleeBiz ? globalCalleeGraph.coll : globalCallerGraph.coll;
+                    drawCollectionModelContent(currentWorkingCollectionData);
+                    $("#collection-calls-button").removeAttr("disabled");
 
                     $("#search-button").html('Search');
                     $("#search-button").removeAttr("disabled");
@@ -457,6 +475,10 @@ $(document).ready(function () {
 
     });
 
+    /**
+     * Q helper
+     * find qualified name registration and business.
+     */
     $("#name-search-button").on('click', function(){
         $("#name-search-button").prop("disabled", "disabled");
         $("#name-search-button").text('Matching...');
@@ -474,13 +496,14 @@ $(document).ready(function () {
                 $("#name-search-button").removeAttr("disabled");
                 $("#name-search-button").text('Find qualified name');
 
-                setNameHelperHistory('nameSearchClass', $('#method-keyword-input-class').val().trim());
-                setNameHelperHistory('nameSearchMethod', $('#method-keyword-input-method').val().trim());
-                getNameHelperHistory('nameSearchClass', 'class-datalist');
-                getNameHelperHistory('nameSearchMethod', 'method-datalist');
+                // setNameHelperHistory('nameSearchClass', $('#method-keyword-input-class').val().trim());
+                // setNameHelperHistory('nameSearchMethod', $('#method-keyword-input-method').val().trim());
+                // getNameHelperHistory('nameSearchClass', 'class-datalist');
+                // getNameHelperHistory('nameSearchMethod', 'method-datalist');
 
                 let rowCnt = 1;
-                let htmlContent = '<table class="table table-sm table-striped table-hover">' +
+                let htmlContent = '' +
+                    '<table class="table table-sm table-striped table-hover">' +
                     '  <thead>' +
                     '    <tr>' +
                     '      <th scope="col">#</th>' +
@@ -491,101 +514,110 @@ $(document).ready(function () {
                     '  <tbody>';
 
                 for (let key in data.treeGraphData.children) {
-                    htmlContent += '<tr>' +
-                        '      <th scope="row">' + rowCnt + '</th>' +
-                        '      <td>' + '<button type="button" class="btn btn-primary btn-sm" onclick="$(\'#keyword-input\').val(\''+ data.treeGraphData.children[key].methodQualifiedName +'\');$(\'#name-helper-modal\').modal(\'hide\');">Select</button>' + '</td>' +
-                        '      <td style="white-space: pre-line">' + '<b>' + data.treeGraphData.children[key].methodQualifiedName + '</b>' +
-                                    '<br/>' +
-                                    data.treeGraphData.children[key].methodComment + '</td>' +
-                        '    </tr>';
+                    htmlContent += '' +
+                        '<tr>' +
+                        '  <th scope="row">' + rowCnt + '</th>' +
+                        '  <td>' + '<button type="button" class="btn btn-primary btn-sm" onclick="$(\'#keyword-input\').val(\''+ data.treeGraphData.children[key].methodQualifiedName +'\');$(\'#q-helper-modal\').modal(\'hide\');">SET Q</button>' + '</td>' +
+                        '  <td style="white-space: pre-line">' + '<b>' + data.treeGraphData.children[key].methodQualifiedName + '</b>' +
+                        '    <br/>' +
+                             data.treeGraphData.children[key].methodComment +
+                        '  </td>' +
+                        '</tr>';
                     rowCnt++;
                 }
 
-                $("#name-helper-modal-info").html(htmlContent);
-
+                $("#q-helper-modal-info").html(htmlContent);
 
             },
             error: function (e) {
                 $("#name-search-button").removeAttr("disabled");
-                $("#name-search-button").text('Find qualified name');
+                $("#name-search-button").text("Find qualified name");
 
-                $("#name-helper-modal-info").html('');
+                $("#q-helper-modal-info").html("");
                 $("#system-modal-info").html("Something happened..." + "<br/>" + JSON.stringify(e.responseJSON));
-                $('#system-modal').modal('show');
+                $("#system-modal").modal("show");
             }
         })
     });
 
-    $('#method-keyword-input-class').focus(function(){
-        if ($('#method-keyword-input-class').val().trim() == "") {
-            $('#class-dropdown-div').css('display', 'block');
-        }
-    });
+    // $('#method-keyword-input-class').focus(function(){
+    //     if ($('#method-keyword-input-class').val().trim() == "") {
+    //         $('#class-dropdown-div').css('display', 'block');
+    //     }
+    // });
+    //
+    // $('#method-keyword-input-class').blur(function(){
+    //     if ($('#class-dropdown-div').css('display') == "block") {
+    //         $('#class-dropdown-div').css('display', 'none');
+    //     }
+    // });
 
-    $('#method-keyword-input-class').blur(function(){
-        if ($('#class-dropdown-div').css('display') == "block") {
-            $('#class-dropdown-div').css('display', 'none');
-        }
-    });
+    // $('input[name="node-search-select"]').on('change', function(){
+    //     if (lastNodeId != null){
+    //         var graph;
+    //         if (calleeBiz) {
+    //             graph = globalCalleeGraph.graph;
+    //         } else {
+    //             graph = globalCallerGraph.graph;
+    //         }
+    //         var lastNode = graph.findById(lastNodeId);
+    //         fillOriginColour(graph, lastNode);
+    //     }
+    //     lastKeyword = "";
+    //     nodeIds = new Array();
+    //     nodeSearchIdx = 0;
+    //     lastNodeId = null;
+    //     $("#node-search-result").html("");
+    //     changeNodeSearchFlag();
+    //     $("#method-keyword-input")[0].select();
+    // });
 
-    $('input[name="node-search-select"]').on('change', function(){
-        if (lastNodeId != null){
-            var graph;
-            if (calleeBiz) {
-                graph = globalCalleeGraph.graph;
-            } else {
-                graph = globalCallerGraph.graph;
-            }
-            var lastNode = graph.findById(lastNodeId);
-            fillOriginColour(graph, lastNode);
-        }
-        lastKeyword = "";
-        nodeIds = new Array();
-        nodeSearchIdx = 0;
-        lastNodeId = null;
-        $("#node-search-result").html("");
-        changeNodeSearchFlag();
-        $("#method-keyword-input")[0].select();
-    });
-
-    function changeNodeSearchFlag() {
-        if ($('#node-search-select-path')[0].checked) {
-            nodeSearchPathFlag = true;
-            $('#node-search-title-path').css('display', 'block');
-            $('#node-search-title-comment').css('display', 'none');
-            $('#method-keyword-input').attr('list', 'node-path-datalist');
-        } else {
-            nodeSearchPathFlag = false;
-            $('#node-search-title-path').css('display', 'none');
-            $('#node-search-title-comment').css('display', 'block');
-            $('#method-keyword-input').attr('list', 'node-comment-datalist');
-        }
-    }
+    // function changeNodeSearchFlag() {
+    //     if ($('#node-search-select-path')[0].checked) {
+    //         nodeSearchPathFlag = true;
+    //         $('#node-search-title-path').css('display', 'block');
+    //         $('#node-search-title-comment').css('display', 'none');
+    //         $('#method-keyword-input').attr('list', 'node-path-datalist');
+    //     } else {
+    //         nodeSearchPathFlag = false;
+    //         $('#node-search-title-path').css('display', 'none');
+    //         $('#node-search-title-comment').css('display', 'block');
+    //         $('#method-keyword-input').attr('list', 'node-comment-datalist');
+    //     }
+    // }
 });
 
-function drawCollectionModelContent(workingCollDat) {
+/**
+ * Method call collection modal
+ * collect and draw the method call collection modal contents.
+ *
+ * @param workingCollectionData current showing graph's collection data
+ */
+function drawCollectionModelContent(workingCollectionData) {
     let totalTime = 0;
     let rowCnt = 1;
-    let htmlContent = '<table class="table table-sm table-striped">' +
+    let htmlContent = '' +
+        '<table class="table table-sm table-striped">' +
         '  <thead>' +
         '    <tr>' +
         '      <th scope="col">#</th>' +
-        '      <th scope="col" style="width: 90%;">Method qualified name</th>' +
+        '      <th scope="col" style="width: 90%;">Qualified name</th>' +
         '      <th scope="col">Call times</th>' +
         '    </tr>' +
         '  </thead>' +
         '  <tbody>';
-    for (let key in workingCollDat) {
-        htmlContent += '<tr>' +
-            '      <th scope="row">' + rowCnt + '</th>' +
-            '      <td>' + key + '</td>' +
-            '      <td style="text-align: right;">' + workingCollDat[key] + '</td>' +
-            '    </tr>';
+    for (let key in workingCollectionData) {
+        htmlContent += '' +
+            '<tr>' +
+            '  <th scope="row">' + rowCnt + '</th>' +
+            '  <td>' + key + '</td>' +
+            '  <td style="text-align: right;">' + workingCollectionData[key] + '</td>' +
+            '</tr>';
         rowCnt++;
-        totalTime += workingCollDat[key];
+        totalTime += workingCollectionData[key];
     }
-    $("#collection-modal-info").html(htmlContent);
-    $("#collection-modal-info").html($("#collection-modal-info").html() + "<hr/>" + "<span style='float: right;'>Total calls: " + "<b>" + totalTime + "</b></span>");
+    $("#collection-calls-modal-info").html(htmlContent);
+    $("#collection-calls-modal-info").html($("#collection-calls-modal-info").html() + "<hr/>" + "<span style='float: right;'>Total calls: " + "<b>" + totalTime + "</b></span>");
 }
 
 function collapseNode(graphJson, collapsed) {
@@ -615,77 +647,39 @@ function fillOriginColour(graph, node) {
 }
 
 function fillSearchColour(graph, node) {
-    node.get('group').getChildByIndex(1).attr("fill", "rgba(0, 150, 100, 0.6)");
+    node.get('group').getChildByIndex(1).attr("fill", "rgba(255, 255, 15, 0.6)");
     graph.refresh();
 }
 
-function addMinimapTitle(calleeBiz, drawingGraph, minimap, left, top) {
-    var titleId = "";
-    if (calleeBiz) {
-        titleId = 'minimap-callee-area-title';
-    } else {
-        titleId = 'minimap-caller-area-title';
-    }
-    let htmlContent = '<div id="';
-    htmlContent += titleId;
-    htmlContent += '" class="area-title"';
-    htmlContent += 'style="position: absolute;top: -1.2rem;background: white;left: -0.1rem;border: 2px solid gray;cursor: move;">';
-    htmlContent += '<strong>&nbsp;&nbsp;Mini Map&nbsp;&nbsp;</strong></div>';
-    let miniMapObj = $(".g6-minimap-viewport");
-    for (var i = 0; i < miniMapObj.length; i++){
-        if (!$(miniMapObj[i]).prev().hasClass("area-title")){
-            if (left != null){
-                $(miniMapObj[i]).parent().parent().css("left", left);
-                $(miniMapObj[i]).parent().parent().css("top", top);
-            }
-            $(miniMapObj[i]).before(htmlContent);
-            $(miniMapObj[i]).parent().parent().draggable({cursor: "move", handle: "div#" + titleId});
-            $(miniMapObj[i]).parent().parent().resizable({handles:'sw,se', distance: 8, stop: function (event, ui) {
-                var left = $(this).css("left");
-                var top = $(this).css("top");
-                drawingGraph.removePlugin(minimap);
-                const newMinimap = new Minimap({
-                    size: [ui.size.width, ui.size.height],
-                    className: 'minimap',
-                    type: 'delegate'
-                });
-                drawingGraph.addPlugin(newMinimap);
-                drawingGraph.refresh();
-                addMinimapTitle(calleeBiz, drawingGraph, newMinimap, left, top);
-            }});
-        }
-    }
-}
-
-function setNameHelperHistory(key, value) {
-    if (value != "") {
-        var arr = JSON.parse(window.localStorage.getItem(key));
-        if (arr == null) {
-        	arr = new Array();
-        }
-        var sameFlag = false;
-        for (var i = 0; i < arr.length; i++) {
-            if (arr[i] == value){
-                sameFlag = true;
-                break;
-            }
-        }
-        if (!sameFlag) {
-        	arr.unshift(value);
-            if (arr.length > 5) {
-            	arr.pop();
-            }
-            window.localStorage.setItem(key, JSON.stringify(arr));
-        }
-    }
-}
-
-function getNameHelperHistory(key, id) {
-    $("#" + id + " option").remove()
-    var arr = JSON.parse(window.localStorage.getItem(key));
-    if (arr != null) {
-        for (var i = 0; i < arr.length; i++) {
-            $("#" + id).append('<option value="' + arr[i] + '">');
-        }
-    }
-}
+// function setNameHelperHistory(key, value) {
+//     if (value != "") {
+//         var arr = JSON.parse(window.localStorage.getItem(key));
+//         if (arr == null) {
+//         	arr = new Array();
+//         }
+//         var sameFlag = false;
+//         for (var i = 0; i < arr.length; i++) {
+//             if (arr[i] == value){
+//                 sameFlag = true;
+//                 break;
+//             }
+//         }
+//         if (!sameFlag) {
+//         	arr.unshift(value);
+//             if (arr.length > 5) {
+//             	arr.pop();
+//             }
+//             window.localStorage.setItem(key, JSON.stringify(arr));
+//         }
+//     }
+// }
+//
+// function getNameHelperHistory(key, id) {
+//     $("#" + id + " option").remove()
+//     var arr = JSON.parse(window.localStorage.getItem(key));
+//     if (arr != null) {
+//         for (var i = 0; i < arr.length; i++) {
+//             $("#" + id).append('<option value="' + arr[i] + '">');
+//         }
+//     }
+// }

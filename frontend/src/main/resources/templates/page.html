@@ -10,9 +10,8 @@
     <link th:href="@{/webjars/jquery-ui/1.12.1/jquery-ui.css}" rel="stylesheet"/>
     <link th:href="@{/static/page.css}" rel="stylesheet"/>
 </head>
-<body>
-<div id="watermark"></div>
-<div id="content" style="padding:2rem;">
+<body style="overflow-y: hidden;">
+<div id="content" style="padding:2rem 2rem 0rem 2rem;">
     <div id="top-left-info"
          style="position: absolute; top:0.4rem; left: 0.4rem; font-size: 1px; color: gray; text-align: right;">
         <img src="../../static/jchv-bg.png" style="width: 10rem;">
@@ -31,12 +30,12 @@
         Copyright © 2020 i-solver Corporation<br/>
     </div>
 
-    <div id="main-content" style="padding:2rem;">
+    <div id="main-content" style="padding:2rem 2rem 0rem 2rem;">
         <div id="input-area" class="input-group input-group-lg">
             <div class="input-group-prepend">
                 <span class="input-group-text" id="inputGroup-sizing-lg"><i class="fas fa-search"></i></span>
             </div>
-            <input id="keyword-input" type="text" class="form-control" placeholder="Enter qualified name here...">
+            <input id="keyword-input" type="text" class="form-control" placeholder="Enter qualified name here..." value="jp.co.toyotsu.jast.lj.lj04.service.lj04s0190.Lj04U0192SearchService.search(Lj04U0192Criteria, Pageable, List<Lj04U0192Model>)">
             <div class="input-group-append">
                 <button id="search-button" type="button" class="btn btn-primary btn-lg">Search</button>
             </div>
@@ -59,16 +58,16 @@
                     </div>
                     <div class="col" style="text-align: right;">
                         <button id="node-search-div-button" type="button" class="btn btn-outline-primary" data-toggle="button">Method Search</button>
-                        <button id="name-helper-button" type="button" class="btn btn-outline-primary" data-toggle="modal" data-target="#name-helper-modal">Name helper</button>
+                        <button id="q-helper-button" type="button" class="btn btn-outline-primary" data-toggle="modal" data-target="#q-helper-modal">Q helper</button>
                         <button id="reset-layout-button" type="button" class="btn btn-outline-primary">Reset layout</button>
-                        <button id="collection-button" type="button" class="btn btn-outline-primary" disabled>Collection</button>
+                        <button id="collection-calls-button" type="button" class="btn btn-outline-primary" disabled>Calls</button>
                     </div>
                 </div>
             </div>
             <hr/>
             <div class="tab-content" id="pills-tabContent">
-                <div id="info-area" style="left:80px;top:240px;">
-                    <div id="info-area-title"
+                <div id="inspector-panel">
+                    <div id="inspector-panel-title"
                          style="position: absolute;top: -1.2rem;background: white;left: -0.1rem;border: 2px solid gray;cursor: move;">
                         <strong>&nbsp;&nbsp;Inspector&nbsp;&nbsp;</strong></div>
                     <div id="info-content" style="padding: 0.4rem">
@@ -81,7 +80,7 @@
                     </div>
                     <div id="info-button-layer">
                         <button id="info-func-btn-1" type="button" class="btn btn-outline-primary btn-sm">SET Q</button>
-                        <span id="reset-handler"
+                        <span id="inspector-panel-reset-handler"
                               style="right: 1.8rem; bottom: 0.4rem; position: absolute; cursor: pointer;"
                               title="Reset panel size&position"><i class="fas fa-ruler-combined"></i></span>
                     </div>
@@ -140,27 +139,27 @@
             </div>
         </div>
     </div>
-    <div class="modal fade" id="collection-modal" tabindex="-1" role="dialog" style="font-size: 13px;">
+    <div class="modal fade" id="collection-calls-modal" tabindex="-1" role="dialog" style="font-size: 13px;">
         <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-xl" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Collection</h5>
+                    <h5 class="modal-title">Calls</h5>
                     <button type="button" class="close" data-dismiss="modal">
                         <span>&times;</span>
                     </button>
                 </div>
-                <div id="collection-modal-info" class="modal-body"></div>
+                <div id="collection-calls-modal-info" class="modal-body"></div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
     </div>
-    <div class="modal fade" id="name-helper-modal" tabindex="-1" role="dialog" style="font-size: 13px;">
+    <div class="modal fade" id="q-helper-modal" tabindex="-1" role="dialog" style="font-size: 13px;">
         <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-xl" role="document">
             <div class="modal-content" style="min-height:80%;">
                 <div class="modal-header">
-                    <h5 class="modal-title">Name helper</h5>
+                    <h5 class="modal-title">Q helper - Find qualified name by class name and/or method name</h5>
                     <button type="button" class="close" data-dismiss="modal">
                         <span>&times;</span>
                     </button>
@@ -183,7 +182,7 @@
                             <button id="name-search-button" type="button" class="btn btn-primary btn-lg">Find qualified name</button>
                         </div>
                     </div>
-                    <div id="name-helper-modal-info" style="padding-top: 1rem; "></div>
+                    <div id="q-helper-modal-info" style="padding-top: 1rem; "></div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -197,7 +196,7 @@
 <script th:src="@{/webjars/jquery-ui/1.12.1/jquery-ui.js}"></script>
 <script th:src="@{/webjars/popper.js/1.15.0/umd/popper.js}"></script>
 <script th:src="@{/webjars/bootstrap/4.3.1/js/bootstrap.min.js}"></script>
-<script th:src="@{/static/g6.js}"></script>
+<script th:src="@{/static/g6.min.js}"></script>
 <script th:src="@{/static/minimap.js}"></script>
 <script th:src="@{/static/page.js}"></script>
 

@@ -10,27 +10,17 @@ div.tooltip-inner > div:nth-child(6) {
     text-align: right;
 }
 
-/*div#watermark {*/
-/*    position: fixed;*/
-/*    width: 100%;*/
-/*    height: 100%;*/
-/*    opacity: 0.2;*/
-/*    z-index: -10;*/
-/*    background: url('/static/jchv-bg.png') center center no-repeat;*/
-/*    pointer-events: none;*/
-/*}*/
-
-div#info-area {
+div#inspector-panel {
     display: flex;
     flex-direction: column;
     width: 30rem;
-    height: 160px;
+    height: 10rem;
     padding-bottom: 2.2rem;
     font-size: 14px;
     border: 2px solid gray;
     position: absolute;
-    top: 14.5rem;
-    left: 5rem;
+    top: 14rem;
+    left: 4rem;
     z-index: 10;
     background: rgba(255, 255, 255, 0.9);
 }
@@ -78,11 +68,11 @@ div#search-button-layer {
     background: #F1F1F1;
 }
 
-.minimap {
+.g6-minimap {
     border: 2px solid gray;
     position: absolute;
-    top: 1rem;
-    right: 1rem;
+    top: 14rem;
+    right: 4rem;
     background: rgba(255, 255, 255, 0.6);
 }
 
