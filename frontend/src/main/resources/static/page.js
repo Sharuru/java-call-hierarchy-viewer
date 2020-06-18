@@ -366,7 +366,8 @@ $(document).ready(function () {
                         globalCallerGraph = {};
                     }
                     const minimap = new G6.Minimap({
-                        size: [160, 160]
+                        size: [160, 160],
+                        type: 'delegate'
                     });
 
                     let containerId = calleeBiz ? 'callee-graph-container' : 'caller-graph-container';
