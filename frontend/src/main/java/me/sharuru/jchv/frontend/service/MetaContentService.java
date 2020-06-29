@@ -22,6 +22,10 @@ public class MetaContentService {
     @Autowired
     MetaDataRepository metaDataRepository;
 
+    LinkedList<String> callerFileLines = new LinkedList<>();
+
+    LinkedList<String> notFoundList = new LinkedList<>();
+
     /**
      * Get callee method information
      *
@@ -123,9 +127,41 @@ public class MetaContentService {
         BusinessApiResponse response = new BusinessApiResponse();
 
         List<TblMetaData> metaLayer = metaDataRepository.findCalleeByMethodQualifiedName(methodCalleeQualifiedName);
-
+        callerFileLines = new LinkedList<>();
+        notFoundList = new LinkedList<>();
         if (metaLayer.isEmpty() || (!"BASE".equals(metaLayer.get(0).getMethodType()) && !"ITFS".equals(metaLayer.get(0).getMethodType()))) {
-            throw new RuntimeException("Meta node is not found: " + methodCalleeQualifiedName);
+            int idx = methodCalleeQualifiedName.indexOf('(');
+            String fuzzyMethodCalleeQualifiedName = methodCalleeQualifiedName.substring(0, idx == -1 ? methodCalleeQualifiedName.length() : idx);
+            metaLayer = metaDataRepository.findFuzzyCalleeByMethodQualifiedName(fuzzyMethodCalleeQualifiedName);
+            // DISTINCT
+            if (metaLayer.stream().distinct().limit(2).count() <= 1 || metaLayer.isEmpty() || (!"BASE".equals(metaLayer.get(0).getMethodType()) && !"ITFS".equals(metaLayer.get(0).getMethodType()))) {
+                notFoundList.add(methodCalleeQualifiedName);
+                response.setFuzzyQualifiedName(methodCalleeQualifiedName);
+            } else {
+                TblMetaData metaBase = metaLayer.get(0);
+                response.setFuzzyQualifiedName(metaBase.getMethodQualifiedName());
+                response.getTreeGraphData().setId(metaBase.getId());
+                response.getTreeGraphData().setMethodQualifiedName(metaBase.getMethodCalleeQualifiedName());
+                response.getTreeGraphData().setMethodPath(metaBase.getMethodPath());
+                response.getTreeGraphData().setMethodType(metaBase.getMethodType());
+                response.getTreeGraphData().setMethodComment(metaBase.getMethodComment());
+
+                Map<String, Integer> callerMethodIndexMap = new HashMap<>();
+                callerMethodIndexMap.put(metaBase.getMethodCalleeQualifiedName(), 1);
+                LinkedList<String> methodPathList = new LinkedList<>();
+                response.getTreeGraphData().getUiMethodContext();
+                methodPathList.add(metaBase.getId().toString().concat("|@|")
+                        .concat(response.getTreeGraphData().getUiMethodPath()).concat("|@|")
+                        .concat(metaBase.getMethodComment()));
+
+                response.getTreeGraphData()
+                        .setChildren(visitCallerMethod(
+                                metaDataRepository.findCallerByMethodCalleeQualifiedName(
+                                        metaBase.getMethodQualifiedName()),
+                                callerMethodIndexMap, methodPathList));
+                response.setMethodIndexMap(callerMethodIndexMap);
+                response.setMethodPathList(methodPathList);
+            }
         } else {
             TblMetaData metaBase = metaLayer.get(0);
             response.getTreeGraphData().setId(metaBase.getId());
@@ -150,8 +186,10 @@ public class MetaContentService {
             response.setMethodIndexMap(callerMethodIndexMap);
             response.setMethodPathList(methodPathList);
 
-            return response;
         }
+        response.setEdgeNodeQualifiedName(callerFileLines);
+        response.setNotFoundCallerQualifiedName(notFoundList);
+        return response;
     }
 
     /**
@@ -226,7 +264,12 @@ public class MetaContentService {
                     methodPathList.add(currentNode.getId().toString().concat("|@|")
                             .concat(currentNode.getUiMethodPath()).concat("|@|")
                             .concat(currentNode.getMethodComment()));
-                    currentNode.setChildren(visitCallerMethod(metaDataRepository.findCallerByMethodCalleeQualifiedName(node.getMethodQualifiedName()), idxMap, methodPathList));
+                    List<TblMetaData> subLayerQueryResult = metaDataRepository.findCallerByMethodCalleeQualifiedName(node.getMethodQualifiedName());
+                    if (subLayerQueryResult.isEmpty()) {
+                        log.info("Current node is the final leaf. {}", currentNode.getMethodQualifiedName());
+                        callerFileLines.add(currentNode.getMethodQualifiedName());
+                    }
+                    currentNode.setChildren(visitCallerMethod(subLayerQueryResult, idxMap, methodPathList));
                     nodeGraphList.add(currentNode);
                 }
             }

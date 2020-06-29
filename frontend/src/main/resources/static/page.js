@@ -1,5 +1,8 @@
 $(document).ready(function () {
 
+    // Footer's copyright year
+    document.getElementById("copyright-year").innerHTML = new Date().getFullYear();
+
     /**
      * Inspector panel
      * tooltip registration.
@@ -64,14 +67,6 @@ $(document).ready(function () {
 
     $("#search-area").draggable({cursor: "move", handle: "div#search-area-title"});
 
-    // var nodeSearchPathFlag = true;
-    // getNameHelperHistory('nameSearchClass', 'class-datalist');
-    // getNameHelperHistory('nameSearchMethod', 'method-datalist');
-    // getNameHelperHistory('nameSearchNodeMethod', 'node-path-datalist');
-    // getNameHelperHistory('nameSearchNodeComment', 'node-comment-datalist');
-    // changeNodeSearchFlag();
-
-
     /**
      * Method call collection model
      * button click registration.
@@ -80,12 +75,24 @@ $(document).ready(function () {
         $("#collection-calls-modal").modal("show");
     });
 
-
+    /**
+     * Node search button panel
+     * tooltip registration.
+     */
+    $('#node-search-btn').tooltip({
+        'trigger': 'hover',
+        'placement': 'bottom'
+    });
 
     var lastNodeId = null;
     var lastKeyword = "";
     var nodeIds = new Array();
     var nodeSearchIdx = 0;
+
+    /**
+     * Node method search panel
+     * main business registration.
+     */
     $("#node-search-div-button").on('click', function () {
         if (lastNodeId != null){
             var graph;
@@ -95,7 +102,7 @@ $(document).ready(function () {
                 graph = globalCallerGraph.graph;
             }
             var lastNode = graph.findById(lastNodeId);
-            fillOriginColour(graph, lastNode);
+            fillOriginColor(graph, lastNode);
         }
         lastKeyword = "";
         nodeIds = new Array();
@@ -110,10 +117,10 @@ $(document).ready(function () {
         }
     });
 
-    $('#node-search-btn').tooltip({
-        'trigger': 'hover',
-        'placement': 'bottom'
-    });
+    /**
+     * Node method search button
+     * main business registration.
+     */
     $("#node-search-btn").on('click', function () {
         var methodPathArr;
         var graph;
@@ -126,7 +133,7 @@ $(document).ready(function () {
         }
         if (lastNodeId != null){
             var lastNode = graph.findById(lastNodeId);
-            fillOriginColour(graph, lastNode);
+            fillOriginColor(graph, lastNode);
             lastNodeId = null;
         }
         $("#node-search-result").html("");
@@ -141,7 +148,7 @@ $(document).ready(function () {
 
         if (keyword == lastKeyword){
             var node = graph.findById(nodeIds[nodeSearchIdx]);
-            fillSearchColour(graph, node);
+            fillSearchColor(graph, node);
             graph.focusItem(nodeIds[nodeSearchIdx]);
 
             $("#info-qualified-name").text(node.getModel().methodQualifiedName);
@@ -159,14 +166,6 @@ $(document).ready(function () {
             lastKeyword = keyword;
             nodeIds = new Array();
             nodeSearchIdx = 0;
-
-            // if (nodeSearchPathFlag) {
-            //     setNameHelperHistory('nameSearchNodeMethod', keyword);
-            //     getNameHelperHistory('nameSearchNodeMethod', 'node-path-datalist');
-            // } else {
-            //     setNameHelperHistory('nameSearchNodeComment', keyword);
-            //     getNameHelperHistory('nameSearchNodeComment', 'node-comment-datalist');
-            // }
 
             if (typeof methodPathArr === "undefined"){
                 lastKeyword = "";
@@ -190,7 +189,7 @@ $(document).ready(function () {
                 return false;
             }
             var node = graph.findById(nodeIds[nodeSearchIdx]);
-            fillSearchColour(graph, node);
+            fillSearchColor(graph, node);
             graph.focusItem(nodeIds[nodeSearchIdx]);
 
             $("#info-qualified-name").text(node.getModel().methodQualifiedName);
@@ -207,8 +206,11 @@ $(document).ready(function () {
         }
     });
 
+    /**
+     * Main content panel
+     * initialize business.
+     */
     $('a[data-toggle="pill"]').on('shown.bs.tab', function (e) {
-
         if (lastNodeId != null){
             var graph;
             if (calleeBiz) {
@@ -217,7 +219,7 @@ $(document).ready(function () {
                 graph = globalCallerGraph.graph;
             }
             var lastNode = graph.findById(lastNodeId);
-            fillOriginColour(graph, lastNode);
+            fillOriginColor(graph, lastNode);
         }
         lastKeyword = "";
         nodeIds = new Array();
@@ -245,7 +247,9 @@ $(document).ready(function () {
 
     });
 
-    // Graph
+    /**
+     * G6 node registration
+     */
     G6.registerNode(
         'method-card',
         {
@@ -326,6 +330,10 @@ $(document).ready(function () {
     let calleeBiz = true;
     let apiLink = null;
 
+    /**
+     * Node search button
+     * main business registration.
+     */
     $("#search-button").on('click', function () {
 
         lastKeyword = "";
@@ -417,6 +425,7 @@ $(document).ready(function () {
                     drawingGraph.data(data.treeGraphData);
                     drawingGraph.render();
                     drawingGraph.on('node:contextmenu', ev => {
+                        ev.preventDefault();
                         const classname = ev.target.get('className');
                         const item = ev.item;
                         if (classname === '_id-hover-layer' && item) {
@@ -497,11 +506,6 @@ $(document).ready(function () {
                 $("#name-search-button").removeAttr("disabled");
                 $("#name-search-button").text('Find qualified name');
 
-                // setNameHelperHistory('nameSearchClass', $('#method-keyword-input-class').val().trim());
-                // setNameHelperHistory('nameSearchMethod', $('#method-keyword-input-method').val().trim());
-                // getNameHelperHistory('nameSearchClass', 'class-datalist');
-                // getNameHelperHistory('nameSearchMethod', 'method-datalist');
-
                 let rowCnt = 1;
                 let htmlContent = '' +
                     '<table class="table table-sm table-striped table-hover">' +
@@ -540,52 +544,6 @@ $(document).ready(function () {
             }
         })
     });
-
-    // $('#method-keyword-input-class').focus(function(){
-    //     if ($('#method-keyword-input-class').val().trim() == "") {
-    //         $('#class-dropdown-div').css('display', 'block');
-    //     }
-    // });
-    //
-    // $('#method-keyword-input-class').blur(function(){
-    //     if ($('#class-dropdown-div').css('display') == "block") {
-    //         $('#class-dropdown-div').css('display', 'none');
-    //     }
-    // });
-
-    // $('input[name="node-search-select"]').on('change', function(){
-    //     if (lastNodeId != null){
-    //         var graph;
-    //         if (calleeBiz) {
-    //             graph = globalCalleeGraph.graph;
-    //         } else {
-    //             graph = globalCallerGraph.graph;
-    //         }
-    //         var lastNode = graph.findById(lastNodeId);
-    //         fillOriginColour(graph, lastNode);
-    //     }
-    //     lastKeyword = "";
-    //     nodeIds = new Array();
-    //     nodeSearchIdx = 0;
-    //     lastNodeId = null;
-    //     $("#node-search-result").html("");
-    //     changeNodeSearchFlag();
-    //     $("#method-keyword-input")[0].select();
-    // });
-
-    // function changeNodeSearchFlag() {
-    //     if ($('#node-search-select-path')[0].checked) {
-    //         nodeSearchPathFlag = true;
-    //         $('#node-search-title-path').css('display', 'block');
-    //         $('#node-search-title-comment').css('display', 'none');
-    //         $('#method-keyword-input').attr('list', 'node-path-datalist');
-    //     } else {
-    //         nodeSearchPathFlag = false;
-    //         $('#node-search-title-path').css('display', 'none');
-    //         $('#node-search-title-comment').css('display', 'block');
-    //         $('#method-keyword-input').attr('list', 'node-comment-datalist');
-    //     }
-    // }
 });
 
 /**
@@ -621,6 +579,13 @@ function drawCollectionModelContent(workingCollectionData) {
     $("#collection-calls-modal-info").html($("#collection-calls-modal-info").html() + "<hr/>" + "<span style='float: right;'>Total calls: " + "<b>" + totalTime + "</b></span>");
 }
 
+/**
+ * Collapse node
+ * collapse graph node when parents' node is under interaction.
+ *
+ * @param graphJson graph data
+ * @param collapsed target node is collapsed
+ */
 function collapseNode(graphJson, collapsed) {
     for(let key in graphJson) {
         let element = graphJson[key];
@@ -633,7 +598,15 @@ function collapseNode(graphJson, collapsed) {
         }
     }
 }
-function fillOriginColour(graph, node) {
+
+/**
+ * Recover node origin color
+ * recover the target node to its default color
+ *
+ * @param graph target graph
+ * @param node target node
+ */
+function fillOriginColor(graph, node) {
     var methodType = node.getModel().methodType;
     var colour = null;
     if (methodType === 'BASE'){
@@ -647,40 +620,14 @@ function fillOriginColour(graph, node) {
     graph.refresh();
 }
 
-function fillSearchColour(graph, node) {
+/**
+ * Set node highlight color
+ * set the target node with highlight background color.
+ *
+ * @param graph target graph
+ * @param node target node
+ */
+function fillSearchColor(graph, node) {
     node.get('group').getChildByIndex(1).attr("fill", "rgba(255, 255, 15, 0.6)");
     graph.refresh();
 }
-
-// function setNameHelperHistory(key, value) {
-//     if (value != "") {
-//         var arr = JSON.parse(window.localStorage.getItem(key));
-//         if (arr == null) {
-//         	arr = new Array();
-//         }
-//         var sameFlag = false;
-//         for (var i = 0; i < arr.length; i++) {
-//             if (arr[i] == value){
-//                 sameFlag = true;
-//                 break;
-//             }
-//         }
-//         if (!sameFlag) {
-//         	arr.unshift(value);
-//             if (arr.length > 5) {
-//             	arr.pop();
-//             }
-//             window.localStorage.setItem(key, JSON.stringify(arr));
-//         }
-//     }
-// }
-//
-// function getNameHelperHistory(key, id) {
-//     $("#" + id + " option").remove()
-//     var arr = JSON.parse(window.localStorage.getItem(key));
-//     if (arr != null) {
-//         for (var i = 0; i < arr.length; i++) {
-//             $("#" + id).append('<option value="' + arr[i] + '">');
-//         }
-//     }
-// }

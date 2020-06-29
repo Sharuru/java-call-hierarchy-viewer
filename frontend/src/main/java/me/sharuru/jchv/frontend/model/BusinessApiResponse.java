@@ -39,4 +39,19 @@ public class BusinessApiResponse implements Serializable {
      * Tree graph data
      */
     private TreeGraphNode treeGraphData = new TreeGraphNode();
+
+    /**
+     * Edge nodes' qualified name list
+     */
+    private LinkedList<String> edgeNodeQualifiedName = new LinkedList<>();
+
+    /**
+     * Not found callers' qualified name list
+     */
+    private LinkedList<String> notFoundCallerQualifiedName = new LinkedList<>();
+
+    /**
+     * Fuzzy qualified name
+     */
+    private String fuzzyQualifiedName = "<-";
 }

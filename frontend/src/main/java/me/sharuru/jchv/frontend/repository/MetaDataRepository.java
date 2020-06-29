@@ -23,4 +23,7 @@ public interface MetaDataRepository extends JpaRepository<TblMetaData, Long>, Qu
 
     @Query(value = "SELECT c FROM TblMetaData c WHERE (c.methodCalleeClass = :methodCalleeClass OR :methodCalleeClass = '') AND (c.methodCalleeMethod = :methodCalleeMethod OR :methodCalleeMethod = '') AND (c.methodType = 'BASE' OR c.methodType = 'ITFS') ORDER BY c.id ASC")
     List<TblMetaData> findQualifiedBySimpleName(@Param("methodCalleeClass") String methodCalleeClass, @Param("methodCalleeMethod") String methodCalleeMethod);
+
+    @Query(value = "SELECT c FROM TblMetaData c WHERE c.methodQualifiedName LIKE :methodQualifiedName% ORDER BY c.methodCalleeSeq ASC")
+    List<TblMetaData> findFuzzyCalleeByMethodQualifiedName(@Param("methodQualifiedName") String methodQualifiedName);
 }
