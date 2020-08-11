@@ -246,6 +246,7 @@ public class Application implements IApplication {
 			}
 			int methodCalleeSeq = 1;
 			for (IMethod callee : callees) {
+				String methodCalleeQualifiedName = getMethodFullName(callee);
 
 				//
 				String newCalleeParamStr = "";
@@ -299,8 +300,7 @@ public class Application implements IApplication {
 					methodCallee = binPath;
 
 				} else {
-					String path = callee.getPath() + "#" + callee.getElementName();
-					if (!(method.getPath() + "#" + method.getElementName()).equals(path)) {
+					if (!methodQualifiedName.equals(methodCalleeQualifiedName)) {
 						methodType = "SRC";
 						methodCallee = callee.getPath() + "#" + callee.getElementName() + "(" + newCalleeParamStr + ")";
 					} else {
@@ -324,7 +324,6 @@ public class Application implements IApplication {
 						}
 					}
 				}
-				String methodCalleeQualifiedName = getMethodFullName(callee);
 
 				String subMethodCalleeQualifiedName = methodCalleeQualifiedName.substring(0,
 						methodCalleeQualifiedName.lastIndexOf('(') + 1);
